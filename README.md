@@ -1,2 +1,2 @@
 # My-VimCfg
-Gotta store my configs somewhere save
+Gotta store my configs somewhere safe
