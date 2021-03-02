@@ -1,5 +1,7 @@
 " The Leader key
 let g:mapleader=','
+let maplocalleader = "\\"
+let g:agdavim_enable_goto_definition = 0
 " Opens up the main config file of your Vim distribution
 "c for config, f for file
 nnoremap <C-x>cf :e $MYVIMRC<CR>
@@ -19,6 +21,13 @@ set shell=/usr/local/bin/fish
 set updatetime=100 "Used in VimGutter
 set inccommand=nosplit " Previews changes done in interactive commands
 
+let g:ctrlp_prompt_mappings = {
+  \ 'PrtCurLeft()':        ['<left>'],
+  \ 'PrtCurRight()':       ['<right>'],
+  \ 'ToggleType(1)':       ['<c-l>'],
+  \ 'ToggleType(-1)':      ['<c-h>'],
+  \ }
+
 let g:idris2_load_on_start = v:false
 " Not used
 let g:idrisIdeDisableDefaultMaps = v:false
@@ -28,10 +37,17 @@ let g:idrisIdeDisableDefaultMaps = v:false
 " opens a file in the running neovim instance
 "Plugin configuration start
 call plug#begin()
+"Similar to fzf
+Plug 'https://github.com/ctrlpvim/ctrlp.vim'
+"Fuzzy-search for digraphs via ctrlp
+Plug 'https://github.com/naquad/ctrlp-digraphs.vim'
 " Idris 2 integration
 Plug 'ShinKage/nvim-idris2', {'do': 'make build'}
 " A git plugin
 Plug 'tpope/vim-fugitive'
+" Agda plugin
+" Plug 'https://github.com/derekelkins/agda-vim'
+Plug 'https://github.com/GustavoMF31/agda-vim'
 " FZF integration
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -59,8 +75,6 @@ Plug 'https://github.com/dag/vim-fish.git'
 Plug 'https://github.com/bkad/CamelCaseMotion.git'
 " Nice when you can't keep up with your cursor movements all around the frame
 Plug 'https://github.com/blueyed/vim-diminactive.git'
-" Don't remember what's that for
-Plug 'https://github.com/chrisbra/unicode.vim.git'
 " Self-explanatory
 Plug 'https://github.com/JamshedVesuna/vim-markdown-preview.git'
 " Async completion framework
@@ -269,10 +283,11 @@ command! -bar -nargs=? StripTrailingSpaces call <SID>StripTrailingSpaces()
 " Also strips trailing spaces on write
 augroup setupProperties
    autocmd!
-   autocmd FileType * set scroll=2 | set shiftwidth=1 | set indentkeys=
+   autocmd FileType * set shiftwidth=1 | set indentkeys=
    autocmd FileType vim,idris2,python,js,lua set number
    autocmd FileType idris2 set foldmethod=expr | call s:setColors()
    autocmd BufWritePre * :call <SID>StripTrailingSpaces()
+   autocmd FileType agda set number
 augroup END
 
 " Specify how to comment idris code
@@ -517,9 +532,9 @@ nnoremap <silent> <C-x>1 :bfirst<CR>
 nnoremap <C-u> <C-^>
 
 " Looks like one of the installed plugins remaps those keys ??
-nnoremap q: q:
-nnoremap q/ q/
-nnoremap q? q?
+" nnoremap q: q:
+" nnoremap q/ q/
+" nnoremap q? q?
 
 " =================   Window manipulation ====================
 " The code below is pretty bad, copied from somewhere.
