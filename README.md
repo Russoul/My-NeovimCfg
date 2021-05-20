@@ -1,2 +1,2 @@
-# My-VimCfg
-Gotta store my configs somewhere safe
+# My-NeovimCfg
+Gotta store my configs for Neovim somewhere safe
