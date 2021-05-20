@@ -1,5 +1,7 @@
 " The Leader key
-let g:mapleader=','
+" TODO Try out: https://github.com/nvim-telescope/telescope.nvim
+" as a replacement for FZF
+let g:mapleader='|'
 let maplocalleader = "\\"
 let g:agdavim_enable_goto_definition = 0
 " Opens up the main config file of your Vim distribution
@@ -17,34 +19,39 @@ set mouse=a "enables mouse in all modes
 set wildmenu
 set wildmode=list
 set history=200
-set shell=/usr/local/bin/fish
+" Set path to your preferred shell here
+set shell=/Users/russoul/.nix-profile/bin/fish
 set updatetime=100 "Used in VimGutter
 set inccommand=nosplit " Previews changes done in interactive commands
 
-let g:ctrlp_prompt_mappings = {
-  \ 'PrtCurLeft()':        ['<left>'],
-  \ 'PrtCurRight()':       ['<right>'],
-  \ 'ToggleType(1)':       ['<c-l>'],
-  \ 'ToggleType(-1)':      ['<c-h>'],
-  \ }
+" expand UltiSnips abbreviations via this shortcut:
+let g:UltiSnipsExpandTrigger = "<C-]>"
+let g:sneak#label = 0
 
+
+" TODO Is it used or not? -- I have no idea
 let g:idris2_load_on_start = v:false
-" Not used
+" TODO Not used?
 let g:idrisIdeDisableDefaultMaps = v:false
 
+" Sidenote:
 "Use neovim-remote !
 " nvr --remote
 " opens a file in the running neovim instance
+" -------------
+
 "Plugin configuration start
 call plug#begin()
-"Similar to fzf
-Plug 'https://github.com/ctrlpvim/ctrlp.vim'
-"Fuzzy-search for digraphs via ctrlp
-Plug 'https://github.com/naquad/ctrlp-digraphs.vim'
 " Idris 2 integration
+" Edwin's original plugin. Not used.
+" Plug 'https://github.com/edwinb/idris2-vim'
+" This is used by me currently.
+" Hope to switch to Idris2-LSP soonish
 Plug 'ShinKage/nvim-idris2', {'do': 'make build'}
 " A git plugin
 Plug 'tpope/vim-fugitive'
+" Align lines of code in one command with many options of doing it.
+Plug 'godlygeek/tabular'
 " Agda plugin
 " Plug 'https://github.com/derekelkins/agda-vim'
 Plug 'https://github.com/GustavoMF31/agda-vim'
@@ -53,6 +60,8 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 " A plugin for moving around
 Plug 'easymotion/vim-easymotion'
+" Another plugin for moving around. (More lightweight)
+Plug 'justinmk/vim-sneak'
 " Commenting code
 Plug 'https://github.com/tpope/vim-commentary.git'
 " Surrounding text with delimiters
@@ -86,9 +95,13 @@ Plug 'mhinz/vim-signify'
 " Create and manage terminal instances in Vim
 " Has problems with the fish terminals though
 Plug 'kassio/neoterm'
-
 " Colorful parentheses
 Plug 'luochen1990/rainbow'
+" Code snippets (and in particular - abbreviations)
+Plug 'sirver/ultisnips'
+" LSP configs
+Plug 'neovim/nvim-lspconfig'
+Plug 'nvim-lua/plenary.nvim'
 
 " Plugin configuration end
 call plug#end()
@@ -102,8 +115,10 @@ let g:deoplete#enable_at_startup = v:false
 " Also later pick a keybind for switching between manual and auto modes
 " call deoplete#custom#option('auto_complete', 'manual') " manual/auto
 
-" Render .md like github does (almost)
+" Render .md like github does, using grip.
 let vim_markdown_preview_github=1
+let vim_markdown_preview_toggle=2
+let vim_markdown_preview_hotkey='<C-x>ma'
 
 " Set theme and cursor shape/color
 if (has("termguicolors"))
@@ -284,7 +299,7 @@ command! -bar -nargs=? StripTrailingSpaces call <SID>StripTrailingSpaces()
 augroup setupProperties
    autocmd!
    autocmd FileType * set shiftwidth=1 | set indentkeys=
-   autocmd FileType vim,idris2,python,js,lua set number
+   autocmd FileType vim,idris2,python,javascript,lua,c set number
    autocmd FileType idris2 set foldmethod=expr | call s:setColors()
    autocmd BufWritePre * :call <SID>StripTrailingSpaces()
    autocmd FileType agda set number
@@ -325,7 +340,7 @@ tnoremap <C-v><Esc> <C-\><C-n>
 nnoremap <silent> <Leader>q :Bdelete menu<CR>
 
 " remap of Join
-nnoremap <silent> <Leader>j :join<CR>
+nnoremap <silent> <Space>j :join<CR>
 
 "execute visually selected code block (vimL)
 vmap <C-x><C-e> "xy:@x<CR>
@@ -413,7 +428,7 @@ nnoremap <f10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> 
 \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<cr>
 
 " Toggles latest search highlight
-nnoremap ,<space> :set hlsearch!<CR>
+nnoremap <leader><space> :set hlsearch!<CR>
 
 " Keep undo history after exit
 if has('persistent_undo')
@@ -459,11 +474,11 @@ cnoremap <C-l> <C-e>
 nmap <silent> <Space>w <Plug>CamelCaseMotion_w
 nmap <silent> <Space>b <Plug>CamelCaseMotion_b
 nmap <silent> <Space>e <Plug>CamelCaseMotion_e
-nmap <silent> <Space>ge <Plug>CamelCaseMotion_ge
+" nmap <silent> <Space>ge <Plug>CamelCaseMotion_ge
 vmap <silent> <Space>w <Plug>CamelCaseMotion_w
 vmap <silent> <Space>b <Plug>CamelCaseMotion_b
 vmap <silent> <Space>e <Plug>CamelCaseMotion_e
-vmap <silent> <Space>ge <Plug>CamelCaseMotion_ge
+" vmap <silent> <Space>ge <Plug>CamelCaseMotion_ge
 omap <silent> <Space>iw <Plug>CamelCaseMotion_iw
 xmap <silent> <Space>iw <Plug>CamelCaseMotion_iw
 omap <silent> <Space>ib <Plug>CamelCaseMotion_ib
@@ -480,14 +495,14 @@ nmap <Space>g <Plug>(easymotion-overwin-f2)
 " Turn on case-insensitive feature
 let g:EasyMotion_smartcase = 1
 
-" " Move line up
-" map <Space>i <Plug>(easymotion-k)
-" " Move line down
-" map <Space>k <Plug>(easymotion-j)
-" " Move on current line forward
-" map <Space>l <Plug>(easymotion-lineforward)
-" " Move on current line backward
-" map <Space>j <Plug>(easymotion-linebackward)
+" Move line up
+map <Space><space>i <Plug>(easymotion-k)
+" Move line down
+map <Space><space>k <Plug>(easymotion-j)
+" Move on current line forward
+map <Space><space>l <Plug>(easymotion-lineforward)
+" Move on current line backward
+map <Space><space>j <Plug>(easymotion-linebackward)
 
 " Gif config
 map  <Space>/ <Plug>(easymotion-sn)
@@ -500,11 +515,20 @@ cnoremap <silent> <C-x>b :Buffers<CR>
 tnoremap <silent> <C-x>b <C-\><C-n>:Buffers<CR>
 
 " Close all buffers except this one (caveat: doesn't keep the cursor position)
-nnoremap <silent> <C-x>qb :%bd\|e#<CR>
+nnoremap <silent> <C-x>qab :%bd\|e#<CR>
+nnoremap <silent> <C-x>qb :b#<bar>bd#<CR>
 
-nnoremap <silent> <C-x>f :Files<CR>
-cnoremap <silent> <C-x>f :Files<CR>
-tnoremap <silent> <C-x>f <C-\><C-n>:Files<CR>
+"Search the working directory for files.
+nnoremap <silent> <C-x>ff :Files<CR>
+cnoremap <silent> <C-x>ff :Files<CR>
+tnoremap <silent> <C-x>ff <C-\><C-n>:Files<CR>
+
+" Find files in the folder storing all Idris 2 source files
+" It is planned to change this folder soon.
+command! FilesIdr :FZF ~/.idris2/idris2-0.3.0-src
+nnoremap <silent> <C-x>fi :FilesIdr<CR>
+cnoremap <silent> <C-x>fi :FilesIdr<CR>
+tnoremap <silent> <C-x>fi <C-\><C-n>:FilesIdr<CR>
 
 nnoremap <silent> <C-x>w :Windows<CR>
 cnoremap <silent> <C-x>w :Windows<CR>
@@ -898,3 +922,133 @@ endfunction
 " the jump list but only moving along the lines in the current buffer
 nnoremap <silent> <Space><C-I> :call JumpNextInBuf()<CR>
 nnoremap <silent> <Space><C-O> :call JumpPrevInBuf()<CR>
+
+" Simple word completion from dictionary.
+inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'window': { 'width': 0.2, 'height': 0.9, 'xoffset': 1 }})
+
+function! s:openFileAtPos(filename, line, col)
+   silent write
+   execute "edit " . a:filename
+   call setpos('.', [0, a:line, a:col, 0])
+   normal! zz
+endfunction
+
+function! s:openRgFile(str)
+   let [_, f, line, col; rest] = matchlist(a:str, '\v([^:]+):([^:]+):([^:]+):.*')
+   call s:openFileAtPos(f, line, col)
+endfunction
+
+function! RgDir(dir, str)
+  call fzf#run(fzf#wrap({'source' : 'rg -i --no-heading --column '. a:str . ' ' . a:dir,
+                      \  'sink'   : {file -> s:openRgFile(file)},
+                      \  'options' : '-d : --nth 4 --color=dark -1'}))
+endfunction
+
+command! -bang -nargs=* RgIdr call RgDir('~/.idris2/idris2-0.3.0-src', <q-args>)
+
+nnoremap <silent> <C-x>li :call RgDir('~/.idris2/idris2-0.3.0-src', '"' . input('> ') . '"')<CR>
+cnoremap <silent> <C-x>li :call RgDir('~/.idris2/idris2-0.3.0-src', '"' . input('> ') . '"')<CR>
+tnoremap <silent> <C-x>li <C-\><C-n>:call RgDir('~/.idris2/idris2-0.3.0-src', '"' . input('> ') . '"')<CR>
+
+nnoremap <silent> <C-x>ll :call RgDir('.', '"' . input('> ') . '"')<CR>
+cnoremap <silent> <C-x>ll :call RgDir('.', '"' . input('> ') . '"')<CR>
+tnoremap <silent> <C-x>ll <C-\><C-n>:call RgDir('.', '"' . input('> ') . '"')<CR>
+
+vmap gc <C-]>gc<C-]><Esc><Esc>
+
+map f <Plug>Sneak_f
+map F <Plug>Sneak_F
+map t <Plug>Sneak_t
+map T <Plug>Sneak_T
+
+" LSP config for Idris2
+" lua << EOF
+" local lspconfig = require('lspconfig')
+" local configs = require('lspconfig/configs')
+" if not lspconfig.idris2_lsp then
+"   configs.idris2_lsp = {
+"     default_config = {
+"       cmd = {'idris2-lsp'}; -- if not available in PATH, provide the absolute path
+"       filetypes = {'idris2'};
+"       on_new_config = function(new_config, new_root_dir)
+"         new_config.cmd = {'idris2-lsp'}
+"         new_config.capabilities['workspace']['semanticTokens'] = {refreshSupport = true}
+"       end;
+"       root_dir = function(fname)
+"         local scandir = require('plenary.scandir')
+"         local find_ipkg_ancestor = function(fname)
+"           return lspconfig.util.search_ancestors(fname, function(path)
+"             local res = scandir.scan_dir(path, {depth=1; search_pattern='.+%.ipkg'})
+"             if not vim.tbl_isempty(res) then
+"               return path
+"             end
+"           end)
+"         end
+"         return find_ipkg_ancestor(fname) or lspconfig.util.find_git_ancestor(fname) or vim.loop.os_homedir()
+"       end;
+"       settings = {};
+"     };
+"   }
+" end
+" -- Semantic highlightning support is not yet on the main branch, PR#39 is needed
+" -- if you are on the main branch, remove the if in on_attach, the handlers and the highlight commands.
+" -- Flag to enable semantic highlightning on start, if false you have to issue a first command manually
+" local autostart_semantic_highlightning = true
+" lspconfig.idris2_lsp.setup {
+"   on_init = custom_init,
+"   on_attach = function(client)
+"     if autostart_semantic_highlightning then
+"       vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
+"         { textDocument = vim.lsp.util.make_text_document_params() }, nil)
+"     end
+"     --custom_attach(client) -- remove this line if you don't have a customized attach function
+"   end,
+"   autostart = true,
+"   handlers = {
+"     ['workspace/semanticTokens/refresh'] = function(err, method, params, client_id, bufnr, config)
+"       if autostart_semantic_highlightning then
+"         vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
+"           { textDocument = vim.lsp.util.make_text_document_params() }, nil)
+"       end
+"       return vim.NIL
+"     end,
+"     ['textDocument/semanticTokens/full'] = function(err, method, result, client_id, bufnr, config)
+"       -- temporary handler until native support lands
+"       local client = vim.lsp.get_client_by_id(client_id)
+"       local legend = client.server_capabilities.semanticTokensProvider.legend
+"       local token_types = legend.tokenTypes
+"       local data = result.data
+"
+"       local ns = vim.api.nvim_create_namespace('nvim-lsp-semantic')
+"       vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+"       local tokens = {}
+"       local prev_line, prev_start = nil, 0
+"       for i = 1, #data, 5 do
+"         local delta_line = data[i]
+"         prev_line = prev_line and prev_line + delta_line or delta_line
+"         local delta_start = data[i + 1]
+"         prev_start = delta_line == 0 and prev_start + delta_start or delta_start
+"         local token_type = token_types[data[i + 3] + 1]
+"         vim.api.nvim_buf_add_highlight(bufnr, ns, 'LspSemantic_' .. token_type, prev_line, prev_start, prev_start + data[i + 2])
+"       end
+"     end
+"   },
+" }
+"
+" -- Set here your preferred colors for semantic values
+" --vim.cmd [[highlight link LspSemantic_type Include]]   -- Type constructors
+" --vim.cmd [[highlight link LspSemantic_function Identifier]] -- Functions names
+" --vim.cmd [[highlight link LspSemantic_struct Number]]   -- Data constructors
+" --vim.cmd [[highlight LspSemantic_variable guifg=gray]] -- Bound variables
+" --vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
+"
+" -- Add the following command to a mapping if you want to send a manual request for semantic highlight
+" -- :lua vim.lsp.buf_request(0, 'textDocument/semanticTokens/full', {textDocument = vim.lsp.util.make_text_document_params()}, nil)
+"
+" vim.cmd [[highlight LspSemantic_type guifg=#ff9d5c]]     -- Type constructors
+" vim.cmd [[highlight link LspSemantic_function Identifier]] -- Functions names
+" vim.cmd [[highlight link LspSemantic_struct Number]]   -- Data constructors
+" vim.cmd [[highlight LspSemantic_variable guifg=gray]] -- Bound variables
+" vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
+" EOF
+
