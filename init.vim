@@ -684,11 +684,9 @@ function IdrOpenBuf()
   end
 
   -- Move to the very right.
-  vim.fn.win_gotoid(winid)
   vim.cmd("winc L")
-  vim.cmd("vertical resize 58")
   -- Resize
-  vim.cmd("vertical resize 58")
+  vim.cmd("vertical resize 60")
   vim.fn.win_gotoid(curWinId)
 
   return true
