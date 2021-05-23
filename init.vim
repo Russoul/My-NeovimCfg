@@ -838,11 +838,21 @@ vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
 --vim.cmd [[highlight link LspSemantic_struct Number]]   -- Data constructors
 --vim.cmd [[highlight LspSemantic_variable guifg=gray]] -- Bound variables
 --vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
+EOF
 
+nnoremap <LocalLeader>q :lua IdrToggleBuf()<CR>
+" nunmap <LocalLeader>gn
+nnoremap <LocalLeader>j :lua vim.lsp.buf.definition()<CR>
+nnoremap <LocalLeader>h :lua vim.lsp.buf.hover()<CR>
+nnoremap <LocalLeader>p :lua IdrPullDiag()<CR>
+nnoremap ]d :lua vim.lsp.diagnostic.goto_next()<CR>
+nnoremap [d :lua vim.lsp.diagnostic.goto_prev()<CR>
+nnoremap <LocalLeader>r :lua IdrReload()<CR>
+
+lua << EOF
 ------------------------ TELESCOPE ----------------------------
 local actions = require('telescope.actions')
--- Global remapping
-------------------------------
+
 require('telescope').setup{
   defaults = {
     mappings = {
@@ -874,12 +884,3 @@ function IdrReload()
   vim.lsp.buf.execute_command({command = "reload", arguments = {vim.lsp.util.make_range_params().textDocument.uri}})
 end
 EOF
-
-nnoremap <LocalLeader>q :lua IdrToggleBuf()<CR>
-" nunmap <LocalLeader>gn
-nnoremap <LocalLeader>j :lua vim.lsp.buf.definition()<CR>
-nnoremap <LocalLeader>h :lua vim.lsp.buf.hover()<CR>
-nnoremap <LocalLeader>p :lua IdrPullDiag()<CR>
-nnoremap ]d :lua vim.lsp.diagnostic.goto_next()<CR>
-nnoremap [d :lua vim.lsp.diagnostic.goto_prev()<CR>
-nnoremap <LocalLeader>r :lua IdrReload()<CR>
