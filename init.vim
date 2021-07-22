@@ -1,16 +1,17 @@
 " The Leader key
 let g:mapleader='|'
 let maplocalleader = "\\"
-let g:agdavim_enable_goto_definition = 0
+" This setting helps to avoid encoding issues when
+" writing unicode to clipboard (the `+` register)
+let $LANG='en_US.UTF-8'
 " Opens up the main config file of your Vim distribution
 "c for config, f for file
 nnoremap <C-x>cf :e $MYVIMRC<CR>
-let g:main_config_file_dir = "/Users/russoul/.config/nvim"
-
+let g:main_config_file_dir = "$HOME/.config/nvim"
 " Or set to block
-set virtualedit=all
+set virtualedit=block
 set shiftwidth=2
-set tabstop=2
+set tabstop=1
 set smartcase
 set ignorecase
 set maxfuncdepth=10000
@@ -26,15 +27,16 @@ set updatetime=100 "Used in VimGutter
 set inccommand=nosplit " Previews changes done in interactive commands
 " Allow up to 3 signs to be rendered simultaneously
 set signcolumn=auto:3
+" Highlight on yank
+au TextYankPost * lua vim.highlight.on_yank {higroup="IncSearch", timeout=150, on_visual=true}
 
-" expand UltiSnips abbreviations via this shortcut:
-let g:UltiSnipsExpandTrigger = "<C-]>"
-let g:sneak#label = 0
+" Keep undo history after exit
+if has('persistent_undo')
+set undofile
+set undodir=$HOME/.config/nvim/undo
+endif
+" ----------------------------
 
-" TODO Is it used or not? -- I have no idea
-let g:idris2_load_on_start = v:false
-
-let g:signify_priority = 2
 
 " Sidenote:
 "Use neovim-remote !
@@ -45,22 +47,12 @@ let g:signify_priority = 2
 "Plugin configuration start
 call plug#begin()
 " Idris 2 integration
-" Edwin's original plugin. Not used.
+" Edwin's original plugin. Used for syntax highlighting only.
 Plug 'https://github.com/edwinb/idris2-vim'
-" This is used by me currently.
-" Hope to switch to Idris2-LSP soonish
-" Plug 'ShinKage/nvim-idris2', {'do': 'make build'}
 " A git plugin
 Plug 'tpope/vim-fugitive'
 " Align lines of code in one command with many options of doing it.
 Plug 'godlygeek/tabular'
-" Agda plugin
-" Plug 'https://github.com/derekelkins/agda-vim'
-Plug 'https://github.com/GustavoMF31/agda-vim'
-" A plugin for moving around
-Plug 'easymotion/vim-easymotion'
-" Another plugin for moving around. (More lightweight)
-Plug 'justinmk/vim-sneak'
 " Commenting code
 Plug 'https://github.com/tpope/vim-commentary.git'
 " Surrounding text with delimiters
@@ -75,8 +67,6 @@ Plug 'https://github.com/joshdick/onedark.vim.git'
 " Renders a special line at the bottom of each window that reflects user info
 " (programmable)
 Plug 'itchyny/lightline.vim'
-" Not sure what that does anymore ...
-Plug 'https://github.com/dag/vim-fish.git'
 " Motions defined for moving around camel-case words
 Plug 'https://github.com/bkad/CamelCaseMotion.git'
 " Nice when you can't keep up with your cursor movements all around the frame
@@ -87,26 +77,36 @@ Plug 'https://github.com/JamshedVesuna/vim-markdown-preview.git'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 " Pretty smart general completion (though not nearly as smart as they claim)
 Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
-" Plugin for doing your VC tasks in Vim
-Plug 'mhinz/vim-signify'
 " Create and manage terminal instances in Vim
-" Has problems with the fish terminals though
 Plug 'kassio/neoterm'
-" Colorful parentheses
+" Colourful parentheses
 Plug 'luochen1990/rainbow'
-" Code snippets (and in particular - abbreviations)
-Plug 'sirver/ultisnips'
 " LSP configs
 Plug 'neovim/nvim-lspconfig'
+" Used by Telescope
 Plug 'nvim-lua/popup.nvim'
+" Used by many plugins
 Plug 'nvim-lua/plenary.nvim'
 " Handles (multiple) choice generically & comes with a few useful finders.
 Plug 'nvim-telescope/telescope.nvim'
+" Icons
+Plug 'kyazdani42/nvim-web-devicons'
+" Manage git workflow
+Plug 'pwntester/octo.nvim'
+" Successor of Signify for Neovim 0.5
+Plug 'lewis6991/gitsigns.nvim'
+" In-buffer highlighting of colour codes
+Plug 'norcalli/nvim-colorizer.lua'
+" Stand-in for EasyMotion based on Neovim 0.5
+Plug 'phaazon/hop.nvim'
+" Stand-in for VimSneak (works differently)
+Plug 'ggandor/lightspeed.nvim'
 
 " Plugin configuration end
 call plug#end()
 
-let g:rainbow_active = v:false "set to 0 if you want to enable it later via :RainbowToggle
+ "set to 0 if you want to enable it later via :RainbowToggle
+let g:rainbow_active = v:false
 
 " Enable deoplete at startup
 " Not always want that as it depletes a battery real fast
@@ -116,10 +116,12 @@ let g:deoplete#enable_at_startup = v:false
 " call deoplete#custom#option('auto_complete', 'manual') " manual/auto
 
 " Render .md like github does, using grip.
-let vim_markdown_preview_github=1
-let vim_markdown_preview_toggle=2
+"let vim_markdown_preview_github=1
+let vim_markdown_preview_pandoc=1
+let vim_markdown_preview_toggle=0
 let vim_markdown_preview_hotkey='<C-x>ma'
 
+" --------------------------------
 " Set theme and cursor shape/color
 if (has("termguicolors"))
    set termguicolors
@@ -140,9 +142,10 @@ function! s:setColors()
    hi link idrisLineComment Comment
    hi link idrisBlockComment Comment
    hi ColorColumn guibg=#303541
+   hi Search guifg=black guibg=orange4
 endfunction
 call s:setColors()
-
+" --------------------------------
 
 " ================  Configure Lightline ===========================
 let g:lightline = {
@@ -333,11 +336,23 @@ tnoremap <C-v><Esc> <C-\><C-n>
 " remap of Join
 nnoremap <silent> <Space>j :join<CR>
 
+" Unmap this built-in command, else it messes up with the commands below
+vnoremap <C-x> <Nop>
+
 "execute visually selected code block (vimL)
-vmap <C-x><C-e>v "xy:@x<CR>
+vmap <silent> <C-x><C-e>v "xy:@x<CR>
 
 "execute visually selected code block (Lua)
-vmap <C-x><C-e>l "xy:execute(":lua " . @x)<CR>
+vmap <silent> <C-x><C-e>l "xy:execute(":lua " . @x)<CR>
+
+"execute visually selected code block (terminal)
+vnoremap <silent> <C-x><C-e>t :TREPLSendSelection<CR>
+
+"execute visually selected code block (Idris)
+vmap <silent> <C-x><C-e>i "xy:lua IdrRepl("<C-r>x")<CR>
+"execute visually selected code block (Idris) and erase it
+"afterwards
+vmap <silent> <C-x><C-e>I "xy:lua IdrRepl("<C-r>x")<CR>gvx
 
 " Comment out the visually highlighted text.
 vmap gc <C-]>gc<C-]><Esc><Esc>
@@ -412,12 +427,6 @@ nnoremap <f10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> 
 " Toggles latest search highlight
 nnoremap <leader><space> :set hlsearch!<CR>
 
-" Keep undo history after exit
-if has('persistent_undo')
-set undofile
-set undodir=$HOME/.config/nvim/undo
-endif
-
 " ============== MOTION ================
 
 " Main movement remaps
@@ -479,33 +488,28 @@ xmap <silent> <Space>ib <Plug>CamelCaseMotion_ib
 omap <silent> <Space>ie <Plug>CamelCaseMotion_ie
 xmap <silent> <Space>ie <Plug>CamelCaseMotion_ie
 
-" Space is the main prefix key for motion commands
-map <Space><Space> <Plug>(easymotion-prefix)
+lua << EOF
+vim.api.nvim_set_keymap('n', '<space><space>l', "<cmd>HopLine<cr>", {})
+vim.api.nvim_set_keymap('n', '<space><space>w', "<cmd>HopWord<cr>", {})
+vim.api.nvim_set_keymap('n', '<space><space>c1', "<cmd>HopChar1<cr>", {})
+vim.api.nvim_set_keymap('n', '<space><space>c2', "<cmd>HopChar2<cr>", {})
+vim.api.nvim_set_keymap('n', '<space><space>/', "<cmd>HopPattern<cr>", {})
 
-" Move over any open windows
-nmap <Space>g <Plug>(easymotion-overwin-f2)
+function repeat_ft(reverse)
+  local ls = require'lightspeed'
+  ls.ft['instant-repeat?'] = true
+  ls.ft:to(reverse, ls.ft['prev-t-like?'])
+end
+vim.api.nvim_set_keymap('n', ';', '<cmd>lua repeat_ft(false)<cr>',
+                        {noremap = true, silent = true})
+vim.api.nvim_set_keymap('x', ';', '<cmd>lua repeat_ft(false)<cr>',
+                        {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', ',', '<cmd>lua repeat_ft(true)<cr>',
+                        {noremap = true, silent = true})
+vim.api.nvim_set_keymap('x', ',', '<cmd>lua repeat_ft(true)<cr>',
+                        {noremap = true, silent = true})
 
-" Turn on case-insensitive feature
-let g:EasyMotion_smartcase = 1
-
-" Move line up
-map <Space><space>i <Plug>(easymotion-k)
-" Move line down
-map <Space><space>k <Plug>(easymotion-j)
-" Move on current line forward
-map <Space><space>l <Plug>(easymotion-lineforward)
-" Move on current line backward
-map <Space><space>j <Plug>(easymotion-linebackward)
-
-" Gif config
-map  <Space>/ <Plug>(easymotion-sn)
-omap <Space>/ <Plug>(easymotion-tn)
-
-" Vim sneak.
-map f <Plug>Sneak_f
-map F <Plug>Sneak_F
-map t <Plug>Sneak_t
-map T <Plug>Sneak_T
+EOF
 
 " ================ Buffers, Files, Projects ==================
 nnoremap <silent> <C-x>b :lua MyBuffers()<CR>
@@ -557,6 +561,8 @@ nnoremap <C-u> <C-^>
 
 " Source a config file that features a nifty window manipulation interface.
 execute("source " . g:main_config_file_dir . "/config/window_manip.vim")
+" Open an existing terminal instance in the current window.
+nnoremap <silent> <C-w>t :Topen<CR>
 
 function! ShowInPreview(name, fileType, lines)
     let l:command = "silent! pedit! +setlocal\\ " .
@@ -615,13 +621,23 @@ nnoremap <silent> <Space><C-O> :call JumpPrevInBuf()<CR>
 " TODO Reimplement in Telescope.
 " inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'window': { 'width': 0.2, 'height': 0.9, 'xoffset': 1 }})
 
-nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.3.0-src"}})<CR>
-cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.3.0-src"}})<CR>
-tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.3.0-src"}})<CR>
+nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.3.0"}})<CR>
+cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.3.0"}})<CR>
+tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.3.0"}})<CR>
 
 nnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>
 cnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>
 tnoremap <silent> <C-x>ll <C-\><C-n>:lua require("telescope.builtin").live_grep()<CR>
+" ===============================================================
+
+" ================= Other plugin setup ==========================
+lua << EOF
+require('gitsigns').setup()
+require('colorizer').setup()
+require('hop').setup {
+  create_hl_autocmd = true
+}
+EOF
 " ===============================================================
 
 " ================ LSP config for Idris2 ========================
@@ -631,6 +647,10 @@ local configs = require('lspconfig/configs')
 local IdrResponseBufferName = "idris-response"
 
 function IdrInitBuf()
+  if vim.fn.bufexists(IdrResponseBufferName) == 1 then
+    return vim.fn.bufnr(IdrResponseBufferName)
+  end
+
   -- Create / find the existing
   local bufid = vim.fn.bufadd(IdrResponseBufferName)
 
@@ -838,19 +858,56 @@ vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
 --vim.cmd [[highlight link LspSemantic_struct Number]]   -- Data constructors
 --vim.cmd [[highlight LspSemantic_variable guifg=gray]] -- Bound variables
 --vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
+
+function IdrReload()
+  vim.lsp.buf.execute_command({command = "reload", arguments = {vim.lsp.util.make_range_params().textDocument.uri}})
+end
+
+function IdrRepl(cmd)
+  --local table = vim.lsp.util.make_range_params()
+  --table.cmd = cmd
+  vim.lsp.buf_request(0, "workspace/executeCommand", {command = "repl", arguments = {cmd}}, function(err, method, result, client_id, bufnr, config)
+  local buf = IdrInitBuf()
+  vim.fn.appendbufline(buf, '$', "")
+  vim.fn.appendbufline(buf, '$', "-------------")
+  vim.fn.appendbufline(buf, '$', "")
+  for s in result:gmatch("[^\r\n]+") do
+    vim.fn.appendbufline(buf, '$', s)
+  end
+  IdrScrollBuf()
+  end)
+end
+
+function IdrSmartFill(name, sl, sc, el, ec)
+  --local table = vim.lsp.util.make_range_params()
+  --table.cmd = cmd
+  vim.lsp.buf_request(0, "workspace/executeCommand", {command = "smartfill",
+    arguments = {name, tostring(sl - 1), tostring(sc - 1), tostring(el - 1), tostring(ec - 1)}}, function(err, method, result, client_id, bufnr, config)
+  local buf = IdrInitBuf()
+  vim.fn.appendbufline(buf, '$', "")
+  vim.fn.appendbufline(buf, '$', "-------------")
+  vim.fn.appendbufline(buf, '$', "")
+  for s in result:gmatch("[^\r\n]+") do
+    vim.fn.appendbufline(buf, '$', s)
+  end
+  IdrScrollBuf()
+  end)
+end
+
 EOF
 
 nnoremap <LocalLeader>q :lua IdrToggleBuf()<CR>
-" nunmap <LocalLeader>gn
 nnoremap <LocalLeader>j :lua vim.lsp.buf.definition()<CR>
 nnoremap <LocalLeader>h :lua vim.lsp.buf.hover()<CR>
+nnoremap <LocalLeader>a :Telescope lsp_code_actions<CR>
+nnoremap <LocalLeader>d :lua vim.lsp.buf.signature_help()<CR>
 nnoremap <LocalLeader>p :lua IdrPullDiag()<CR>
 nnoremap ]d :lua vim.lsp.diagnostic.goto_next()<CR>
 nnoremap [d :lua vim.lsp.diagnostic.goto_prev()<CR>
 nnoremap <LocalLeader>r :lua IdrReload()<CR>
 
+" ======================== TELESCOPE ============================
 lua << EOF
------------------------- TELESCOPE ----------------------------
 local actions = require('telescope.actions')
 
 require('telescope').setup{
@@ -880,7 +937,200 @@ function MyBuffers()
     end
   })
 end
-function IdrReload()
-  vim.lsp.buf.execute_command({command = "reload", arguments = {vim.lsp.util.make_range_params().textDocument.uri}})
-end
+
+require'nvim-web-devicons'.setup {
+ default = true;
+}
+
 EOF
+
+" ======================== Octo ============================
+lua << EOF
+
+require"octo".setup({
+default_remote = {"upstream", "origin"}; -- order to try remotes
+reaction_viewer_hint_icon = "💬";          -- marker for user reactions
+user_icon = "👤";                         -- user icon
+timeline_marker = "🕑";                   -- timeline marker
+timeline_indent = "2";                   -- timeline indentation
+right_bubble_delimiter = ">>";            -- Bubble delimiter
+left_bubble_delimiter = "<<";             -- Bubble delimiter
+github_hostname = "";                    -- GitHub Enterprise host
+snippet_context_lines = 4;               -- number or lines around commented lines
+file_panel = {
+  size = 10,                             -- changed files panel rows
+  use_icons = true                       -- use web-devicons in file panel
+},
+mappings = {
+  issue = {
+    close_issue = "<space>ic",           -- close issue
+    reopen_issue = "<space>io",          -- reopen issue
+    list_issues = "<space>il",           -- list open issues on same repo
+    reload = "<C-r>",                    -- reload issue
+    open_in_browser = "<C-o>",           -- open issue in browser
+    add_assignee = "<space>aa",          -- add assignee
+    remove_assignee = "<space>ad",       -- remove assignee
+    add_label = "<space>la",             -- add label
+    remove_label = "<space>ld",          -- remove label
+    goto_issue = "<space>gi",            -- navigate to a local repo issue
+    add_comment = "<space>ca",           -- add comment
+    delete_comment = "<space>cd",        -- delete comment
+    next_comment = "]c",                 -- go to next comment
+    prev_comment = "[c",                 -- go to previous comment
+    react_hooray = "<space>rp",          -- add/remove 🎉 reaction
+    react_heart = "<space>rh",           -- add/remove ❤️ reaction
+    react_eyes = "<space>re",            -- add/remove 👀 reaction
+    react_thumbs_up = "<space>r+",       -- add/remove 👍 reaction
+    react_thumbs_down = "<space>r-",     -- add/remove 👎 reaction
+    react_rocket = "<space>rr",          -- add/remove 🚀 reaction
+    react_laugh = "<space>rl",           -- add/remove 😄 reaction
+    react_confused = "<space>rc",        -- add/remove 😕 reaction
+  },
+  pull_request = {
+    checkout_pr = "<space>po",           -- checkout PR
+    merge_pr = "<space>pm",              -- merge PR
+    list_commits = "<space>pc",          -- list PR commits
+    list_changed_files = "<space>pf",    -- list PR changed files
+    show_pr_diff = "<space>pd",          -- show PR diff
+    add_reviewer = "<space>va",          -- add reviewer
+    remove_reviewer = "<space>vd",       -- remove reviewer request
+    close_issue = "<space>ic",           -- close PR
+    reopen_issue = "<space>io",          -- reopen PR
+    list_issues = "<space>il",           -- list open issues on same repo
+    reload = "<C-r>",                    -- reload PR
+    open_in_browser = "<C-o>",           -- open PR in browser
+    add_assignee = "<space>aa",          -- add assignee
+    remove_assignee = "<space>ad",       -- remove assignee
+    add_label = "<space>la",             -- add label
+    remove_label = "<space>ld",          -- remove label
+    goto_issue = "<space>gi",            -- navigate to a local repo issue
+    add_comment = "<space>ca",           -- add comment
+    delete_comment = "<space>cd",        -- delete comment
+    next_comment = "]c",                 -- go to next comment
+    prev_comment = "[c",                 -- go to previous comment
+    react_hooray = "<space>rp",          -- add/remove 🎉 reaction
+    react_heart = "<space>rh",           -- add/remove ❤️ reaction
+    react_eyes = "<space>re",            -- add/remove 👀 reaction
+    react_thumbs_up = "<space>r+",       -- add/remove 👍 reaction
+    react_thumbs_down = "<space>r-",     -- add/remove 👎 reaction
+    react_rocket = "<space>rr",          -- add/remove 🚀 reaction
+    react_laugh = "<space>rl",           -- add/remove 😄 reaction
+    react_confused = "<space>rc",        -- add/remove 😕 reaction
+  },
+  review_thread = {
+    goto_issue = "<space>gi",            -- navigate to a local repo issue
+    add_comment = "<space>ca",           -- add comment
+    add_suggestion = "<space>sa",        -- add suggestion
+    delete_comment = "<space>cd",        -- delete comment
+    next_comment = "]c",                 -- go to next comment
+    prev_comment = "[c",                 -- go to previous comment
+    select_next_entry = "]q",            -- move to previous changed file
+    select_prev_entry = "[q",            -- move to next changed file
+    close_review_tab = "<C-c>",          -- close review tab
+    react_hooray = "<space>rp",          -- add/remove 🎉 reaction
+    react_heart = "<space>rh",           -- add/remove ❤️ reaction
+    react_eyes = "<space>re",            -- add/remove 👀 reaction
+    react_thumbs_up = "<space>r+",       -- add/remove 👍 reaction
+    react_thumbs_down = "<space>r-",     -- add/remove 👎 reaction
+    react_rocket = "<space>rr",          -- add/remove 🚀 reaction
+    react_laugh = "<space>rl",           -- add/remove 😄 reaction
+    react_confused = "<space>rc",        -- add/remove 😕 reaction
+  },
+  submit_win = {
+    approve_review = "<C-a>",            -- approve review
+    comment_review = "<C-m>",            -- comment review
+    request_changes = "<C-r>",           -- request changes review
+    close_review_tab = "<C-c>",          -- close review tab
+  },
+  review_diff = {
+    add_review_comment = "<space>ca",    -- add a new review comment
+    add_review_suggestion = "<space>sa", -- add a new review suggestion
+    focus_files = "<leader>e",           -- move focus to changed file panel
+    toggle_files = "<leader>b",          -- hide/show changed files panel
+    next_thread = "]t",                  -- move to next thread
+    prev_thread = "[t",                  -- move to previous thread
+    select_next_entry = "]q",            -- move to previous changed file
+    select_prev_entry = "[q",            -- move to next changed file
+    close_review_tab = "<C-c>",          -- close review tab
+    toggle_viewed = "<leader><space>",   -- toggle viewer viewed state
+  },
+  file_panel = {
+    next_entry = "j",                    -- move to next changed file
+    prev_entry = "k",                    -- move to previous changed file
+    select_entry = "<cr>",               -- show selected changed file diffs
+    refresh_files = "R",                 -- refresh changed files panel
+    focus_files = "<leader>e",           -- move focus to changed file panel
+    toggle_files = "<leader>b",          -- hide/show changed files panel
+    select_next_entry = "]q",            -- move to previous changed file
+    select_prev_entry = "[q",            -- move to next changed file
+    close_review_tab = "<C-c>",          -- close review tab
+    toggle_viewed = "<leader><space>",   -- toggle viewer viewed state
+  }
+}
+})
+
+EOF
+
+" ============== Mini plugin for 'smart' abbreviations ==============
+
+execute("luafile " . g:main_config_file_dir . "/config/smart_abbrev_map.lua")
+lua << EOF
+
+-- Small test suite:
+-- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek capital Theta") = "Greek capital ϴ", -3
+-- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek small eta") = "Greek small η", -1
+-- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek small \eta") = "Greek small η", -1
+-- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek small beta") = nil
+function SubstLongestMatchRightToLeft(abbrev_list, txt)
+  local longestLength = 0
+  local toSubst = ""
+  for _, abbrev in ipairs(abbrev_list) do
+    local key = abbrev[1]
+    local subst = abbrev[2]
+    local m = txt:match(key .. '$')
+    if m and #m > longestLength then
+      longestLength = #m
+      toSubst = subst
+    end
+  end
+  if toSubst ~= "" then
+    local upToMatch = txt:sub(0, -(longestLength + 1))
+    if upToMatch:sub(#upToMatch, #upToMatch) == smart_abbrev_delim then
+      upToMatch = upToMatch:sub(0, -2)
+    end
+    local newLine = upToMatch .. toSubst
+    return newLine, #toSubst - longestLength
+  else
+    return nil
+  end
+end
+
+-- eta<C-]>   ==> η
+-- \eta<C-]>  ==> η
+-- Theta<C-]>  ==> ϴ
+-- Th\eta<C-]> ==> Thη
+function SmartAbbrevExpand()
+  local lineTxt = vim.fn.getline('.')
+  local buf = vim.fn.getpos('.')[1]
+  local line = vim.fn.getpos('.')[2]
+  local col = vim.fn.getpos('.')[3]
+  local offset = vim.fn.getpos('.')[4]
+  if not lineTxt or not col then
+    vim.fn.echom("Can't expand: getline | getpos returned nil")
+  else
+    local upToCursor = lineTxt:sub(0, col)
+    local upToCursorExpanded, dif = SubstLongestMatchRightToLeft(smart_abbrev_map, upToCursor)
+    if upToCursorExpanded then
+      local expandedLine = upToCursorExpanded .. lineTxt:sub(col + 1)
+      vim.fn.setline('.', expandedLine)
+      vim.fn.setpos('.', {buf, line, col + dif, offset})
+    end
+  end
+end
+
+EOF
+inoremap <silent> <C-]> <Left><C-o>:lua SmartAbbrevExpand()<CR><Right>
+" FIXME doesn't work
+tnoremap <silent> <C-]> <Left><C-\><C-n>:lua SmartAbbrevExpand()<CR><Right>
+unmap <c-x>
+
