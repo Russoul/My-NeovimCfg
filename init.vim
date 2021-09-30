@@ -88,6 +88,7 @@ Plug 'kassio/neoterm'
 Plug 'luochen1990/rainbow'
 " LSP configs
 Plug 'neovim/nvim-lspconfig'
+" Plug 'gwerbin/nvim-lspconfig', {'branch': 'gwerbin/idris2-lsp'}
 " Used by Telescope
 Plug 'nvim-lua/popup.nvim'
 " Used by many plugins
@@ -186,6 +187,8 @@ augroup setupProperties
    autocmd FileType agda set number
    " Filetype for .hott
    autocmd BufNewFile,BufRead *.hott set filetype=hott
+   " Filetype for .idr
+   autocmd BufNewFile,BufRead *.idr set filetype=idris2
 augroup END
 
 " Shortcut that toggles NVimTree on the left of the screen
@@ -366,7 +369,7 @@ tnoremap <silent> <C-x>ff <C-\><C-n>:Telescope fd<CR>
 
 " Find files in the folder storing all Idris 2 source files
 " It is planned to change this folder soon.
-command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.idris2/idris2-0.4.0"}})
+command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.idris2/idris2-0.5.0"}})
 nnoremap <silent> <C-x>fi :FilesIdr<CR>
 cnoremap <silent> <C-x>fi :FilesIdr<CR>
 tnoremap <silent> <C-x>fi <C-\><C-n>:FilesIdr<CR>
@@ -445,9 +448,9 @@ nnoremap <silent> <Space><C-O> :call JumpPrevInBuf()<CR>
 " TODO Reimplement in Telescope.
 " inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'window': { 'width': 0.2, 'height': 0.9, 'xoffset': 1 }})
 
-nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.4.0"}})<CR>
-cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.4.0"}})<CR>
-tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.4.0"}})<CR>
+nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.0"}})<CR>
+cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.0"}})<CR>
+tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.0"}})<CR>
 
 nnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>
 cnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>
@@ -457,7 +460,6 @@ tnoremap <silent> <C-x>ll <C-\><C-n>:lua require("telescope.builtin").live_grep(
 lua << EOF
 local lspconfig = require('lspconfig')
 local configs = require('lspconfig/configs')
-local IdrResponseBufferName = "idris-response"
 
 require("lightspeed-setup")
 require("gitsigns-setup")
@@ -465,7 +467,8 @@ require("colorizer").setup()
 require("hop").setup{create_hl_autocmd = true}
 require("nvim-web-devicons").setup{default = true}
 require("telescope-setup")
-require("idris2-setup")
+-- require("idris2-setup")
+require("idris2-setup-v2")
 require("smart-abbrev-setup")
 require("hott-setup")
 require("lualine-setup")

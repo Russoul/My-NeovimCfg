@@ -37,6 +37,7 @@ lspconfig.hott_lsp.setup {
       return vim.NIL
     end,
     ['textDocument/semanticTokens/full'] = function(err, method, result, client_id, bufnr, config)
+      if not result then return end
       -- temporary handler until native support lands
       local client = vim.lsp.get_client_by_id(client_id)
       local legend = client.server_capabilities.semanticTokensProvider.legend
@@ -54,9 +55,11 @@ lspconfig.hott_lsp.setup {
         prev_start = delta_line == 0 and prev_start + delta_start or delta_start
         local token_type = token_types[data[i + 3] + 1]
         local line = vim.api.nvim_buf_get_lines(bufnr, prev_line, prev_line + 1, false)[1]
-        local byte_start = vim.str_byteindex(line, prev_start)
-        local byte_end = vim.str_byteindex(line, prev_start + data[i + 2])
-        vim.api.nvim_buf_add_highlight(bufnr, ns, 'HOTTSemantic_' .. token_type, prev_line, byte_start, byte_end)
+        if line then
+          local byte_start = vim.str_byteindex(line, prev_start)
+          local byte_end = vim.str_byteindex(line, prev_start + data[i + 2])
+          vim.api.nvim_buf_add_highlight(bufnr, ns, 'HOTTSemantic_' .. token_type, prev_line, byte_start, byte_end)
+        end
       end
     end
   },
@@ -67,3 +70,4 @@ vim.cmd [[highlight link HOTTSemantic_ref Identifier]] -- Functions names
 vim.cmd [[highlight HOTTSemantic_var guifg=gray]] -- Bound variables
 vim.cmd [[highlight link HOTTSemantic_keyword Structure]]  -- Keywords
 vim.cmd [[highlight HOTTSemantic_comment guifg=#99ccff]]  -- Comments
+vim.cmd [[highlight link HOTTSemantic_meta Conditional]]  -- Holes

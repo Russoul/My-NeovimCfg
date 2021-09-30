@@ -121,32 +121,6 @@ function IdrPullDiag()
   IdrScrollBuf()
 end
 
-if not lspconfig.idris2_lsp then
-  configs.idris2_lsp = {
-    default_config = {
-      cmd = {'idris2-lsp'}; -- if not available in PATH, provide the absolute path
-      filetypes = {'idris2'};
-      on_new_config = function(new_config, new_root_dir)
-        new_config.cmd = {'idris2-lsp'}
-        new_config.capabilities['workspace']['semanticTokens'] = {refreshSupport = true}
-      end;
-      root_dir = function(fname)
-        local scandir = require('plenary.scandir')
-        local find_ipkg_ancestor = function(fname)
-          return lspconfig.util.search_ancestors(fname, function(path)
-            local res = scandir.scan_dir(path, {depth=1; search_pattern='.+%.ipkg'})
-            if not vim.tbl_isempty(res) then
-              return path
-            end
-          end)
-        end
-        return find_ipkg_ancestor(fname) or lspconfig.util.find_git_ancestor(fname) or vim.loop.os_homedir()
-      end;
-      settings = {};
-    };
-  }
-end
-
 local autostart_semantic_highlightning = true
 lspconfig.idris2_lsp.setup {
   on_init = custom_init,
@@ -196,23 +170,21 @@ lspconfig.idris2_lsp.setup {
 vim.lsp.handlers["textDocument/publishDiagnostics"] =
 function(err, method, params, client_id)
   (vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-      -- Disable underline, it's very annoying when it covers up whole lines of code
       underline = true,
-      -- So is virtual text, that is almost always obscured by the vertical line border.
       virtual_text = true,
-      -- Render that `E` thingy over the left border.
       signs = true,
       update_in_insert = true
   }))(err, method, params, client_id)
-  --IdrPullDiag()
+  IdrPullDiag()
 end
 
 -- Set here your preferred colors for semantic values
 vim.cmd [[highlight link LspSemantic_type Include]]   -- Type constructors
 vim.cmd [[highlight link LspSemantic_function Identifier]] -- Functions names
 vim.cmd [[highlight link LspSemantic_enumMember Number]]   -- Data constructors
-vim.cmd [[highlight LspSemantic_variable guifg=gray]] -- Bound variables
+vim.cmd [[highlight LspSemantic_variable guifg=Gray]] -- Bound variables
 vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
+vim.cmd [[highlight LspSemantic_postulate guifg=Red]]  -- Postulates
 
 -- Those don't seem to do anything
 -- vim.cmd [[highlight link LspSemantic_namespace Green]]  -- Namespaces

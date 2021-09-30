@@ -1,6 +1,6 @@
 require('kommentary.config').configure_language("hott", {
     single_line_comment_string = "--",
-    prefer_single_line_comments = true
+    multi_line_comment_strings = {"{-", "-}"}
 })
 
 require('kommentary.config').configure_language("idris2", {
