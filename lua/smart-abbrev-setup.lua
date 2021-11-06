@@ -1,5 +1,20 @@
 require("smart_abbrev_map")
 
+local function esc(x)
+   return (x:gsub('%%', '%%%%')
+            :gsub('^%^', '%%^')
+            :gsub('%$$', '%%$')
+            :gsub('%(', '%%(')
+            :gsub('%)', '%%)')
+            :gsub('%.', '%%.')
+            :gsub('%[', '%%[')
+            :gsub('%]', '%%]')
+            :gsub('%*', '%%*')
+            :gsub('%+', '%%+')
+            :gsub('%-', '%%-')
+            :gsub('%?', '%%?'))
+end
+
 -- Small test suite:
 -- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek capital Theta") = "Greek capital ϴ", -3
 -- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek small eta") = "Greek small η", -1
@@ -11,7 +26,7 @@ function SubstLongestMatchRightToLeft(abbrev_list, txt)
   for _, abbrev in ipairs(abbrev_list) do
     local key = abbrev[1]
     local subst = abbrev[2]
-    local m = txt:match(key .. '$')
+    local m = txt:match(esc(key) .. '$')
     if m and #m > longestLength then
       longestLength = #m
       toSubst = subst
@@ -54,4 +69,6 @@ end
 
 -- TODO make this work in terminals and popup windows, like one found in telescope
 vim.api.nvim_set_keymap('i', '<C-]>', '<Left><C-o>:lua SmartAbbrevExpand()<CR><Right>',
+                        {noremap = true, silent = true})
+vim.api.nvim_set_keymap('x', '<C-]>', '<Left><C-o>:lua SmartAbbrevExpand()<CR><Right>',
                         {noremap = true, silent = true})

@@ -32,13 +32,16 @@ set signcolumn=auto:3
 " Highlight on yank (vanity)
 au TextYankPost * lua vim.highlight.on_yank {higroup="IncSearch", timeout=100, on_visual=true}
 
+vmap <C-a> <Nop>
+" God bless this next line.
+vmap <C-x> <Nop>
+
 " Keep undo history after exit
 if has('persistent_undo')
 set undofile
 set undodir=$HOME/.config/nvim/undo
 endif
 " ----------------------------
-
 
 " Sidenote:
 " Use neovim-remote !
@@ -49,6 +52,8 @@ endif
 
 "Plugin configuration start
 call plug#begin()
+" A theme
+Plug 'https://github.com/rakr/vim-one'
 " Idris 2 integration
 " Edwin's original plugin. Used here for syntax highlighting only
 Plug 'https://github.com/edwinb/idris2-vim'
@@ -81,6 +86,8 @@ Plug 'https://github.com/JamshedVesuna/vim-markdown-preview.git'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 " Pretty smart general completion (though not nearly as smart as they claim)
 Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
+
+Plug 'sonph/onehalf', {'rtp': 'vim/'}
 " Create and manage terminal instances in Vim
 " TODO: Find a replacement for this one, favourably targeting Neovim 0.5, Lua
 Plug 'kassio/neoterm'
@@ -107,7 +114,8 @@ Plug 'norcalli/nvim-colorizer.lua'
 Plug 'phaazon/hop.nvim'
 " Stand-in for VimSneak (works differently) targeting Neovim 0.5, Lua
 Plug 'ggandor/lightspeed.nvim'
-
+"
+Plug 'folke/todo-comments.nvim'
 " Plugin configuration end
 call plug#end()
 
@@ -133,6 +141,9 @@ if (has("termguicolors"))
 endif
 syntax enable
 colorscheme onedark
+"colorscheme one
+"set background=dark
+"colorscheme onehalfdark
 set guicursor=n-v-c-sm:block-Cursor,i-ci-ve:ver25-Cursor,r-cr-o:hor20-Cursor
 
 " Colour palette setup
@@ -369,7 +380,7 @@ tnoremap <silent> <C-x>ff <C-\><C-n>:Telescope fd<CR>
 
 " Find files in the folder storing all Idris 2 source files
 " It is planned to change this folder soon.
-command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.idris2/idris2-0.5.0"}})
+command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.idris2/idris2-0.5.1"}})
 nnoremap <silent> <C-x>fi :FilesIdr<CR>
 cnoremap <silent> <C-x>fi :FilesIdr<CR>
 tnoremap <silent> <C-x>fi <C-\><C-n>:FilesIdr<CR>
@@ -448,9 +459,9 @@ nnoremap <silent> <Space><C-O> :call JumpPrevInBuf()<CR>
 " TODO Reimplement in Telescope.
 " inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'window': { 'width': 0.2, 'height': 0.9, 'xoffset': 1 }})
 
-nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.0"}})<CR>
-cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.0"}})<CR>
-tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.0"}})<CR>
+nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.1"}})<CR>
+cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.1"}})<CR>
+tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.1"}})<CR>
 
 nnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>
 cnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>
@@ -474,6 +485,8 @@ require("hott-setup")
 require("lualine-setup")
 require("kommentary-setup")
 require("octo-setup")
+require("todo-comments-setup")
+require("nvim-tree").setup{}
 
 vim.api.nvim_set_keymap('n', '<LocalLeader>j', ':lua vim.lsp.buf.definition()<CR>',
                         {noremap = true, silent = false})

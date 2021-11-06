@@ -121,14 +121,21 @@ function IdrPullDiag()
   IdrScrollBuf()
 end
 
+-- Flag to enable semantic highlightning on start, if false you have to issue a first command manually
 local autostart_semantic_highlightning = true
 lspconfig.idris2_lsp.setup {
-  on_init = custom_init,
+  on_new_config = function(new_config, new_root_dir)
+    new_config.capabilities['workspace']['semanticTokens'] = {refreshSupport = true}
+  end,
   on_attach = function(client)
     if autostart_semantic_highlightning then
       vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
-        { textDocument = vim.lsp.util.make_text_document_params() }, nil)
+        {textDocument = vim.lsp.util.make_text_document_params()}, nil)
     end
+    -- Example of how to request a single kind of code action with a keymap,
+    -- refer to the table in the README for the appropriate key for each command.
+    -- vim.cmd [[nnoremap <Leader>cs <Cmd>lua vim.lsp.buf.code_action({diagnostics={},only={"refactor.rewrite.CaseSplit"}})<CR>]]
+    --custom_attach(client) -- remove this line if you don't have a customized attach function
   end,
   autostart = true,
   handlers = {
@@ -146,7 +153,7 @@ lspconfig.idris2_lsp.setup {
       local token_types = legend.tokenTypes
       local data = result.data
 
-      local ns = vim.api.nvim_create_namespace('nvim-idris2-lsp-semantic')
+      local ns = vim.api.nvim_create_namespace('nvim-lsp-semantic')
       vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
       local tokens = {}
       local prev_line, prev_start = nil, 0
@@ -175,7 +182,7 @@ function(err, method, params, client_id)
       signs = true,
       update_in_insert = true
   }))(err, method, params, client_id)
-  IdrPullDiag()
+  --IdrPullDiag()
 end
 
 -- Set here your preferred colors for semantic values
@@ -188,7 +195,6 @@ vim.cmd [[highlight LspSemantic_postulate guifg=Red]]  -- Postulates
 
 -- Those don't seem to do anything
 -- vim.cmd [[highlight link LspSemantic_namespace Green]]  -- Namespaces
--- vim.cmd [[highlight link LspSemantic_postulate Purple]]  -- Postulates
 -- vim.cmd [[highlight link LspSemantic_module Red]]  -- Modules
 
 -- :lua vim.lsp.buf_request(0, 'textDocument/semanticTokens/full', {textDocument = vim.lsp.util.make_text_document_params()}, nil)

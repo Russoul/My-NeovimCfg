@@ -71,3 +71,35 @@ vim.cmd [[highlight HOTTSemantic_var guifg=gray]] -- Bound variables
 vim.cmd [[highlight link HOTTSemantic_keyword Structure]]  -- Keywords
 vim.cmd [[highlight HOTTSemantic_comment guifg=#99ccff]]  -- Comments
 vim.cmd [[highlight link HOTTSemantic_meta Conditional]]  -- Holes
+
+function HottInfer(expr)
+  vim.lsp.buf_request(0, "workspace/executeCommand", {command = "infer",
+    arguments = {expr}}, function(err, method, result, client_id, bufnr, config)
+      print(result)
+      vim.fn.setreg('x', result)
+  end)
+end
+
+function GetVisuallySelectedText()
+  local s = vim.api.nvim_buf_get_mark(0, "<")
+  local e = vim.api.nvim_buf_get_mark(0, ">")
+  local buildup = ""
+  if not (s[1] == e[1]) then
+    buildup = vim.fn.getline(s[1]):sub(s[2] + 1, -1)
+    for line = s[1] + 1, e[1] do
+      buildup = buildup .. "\n" .. vim.fn.getline(line)
+    end
+    buildup = buildup .. "\n" .. vim.fn.getline(e[1] + 1):sub(1, e[2] + 1)
+  else
+   buildup = vim.fn.getline(s[1]):sub(s[2] + 1, e[2] + 1)
+  end
+  print(buildup)
+  return buildup
+end
+
+-- execute visually selected code block (HOTT)
+vim.api.nvim_set_keymap('v', '<C-x><C-e>t', ':lua GetVisuallySelectedText()<CR>',
+                        {noremap = true, silent = true})
+
+vim.api.nvim_set_keymap('v', '<C-x><C-e>hi', ':lua HottInfer(GetVisuallySelectedText())<CR>',
+                        {noremap = true, silent = true})
