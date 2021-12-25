@@ -1,4 +1,5 @@
 
+-- Assumed to be one-character-long
 smart_abbrev_delim = "\\"
 
 smart_abbrev_map = {
@@ -31,6 +32,8 @@ smart_abbrev_map = {
   {"kappa"  , "κ"},
   {"iota"   , "ι"},
   {"zeta"   , "ζ"},
+  {"Phi"    , "Φ"},
+  {"phi"    , "φ"},
 
   -- Double struck symbols
   {"Zero" , "𝟘"},
@@ -52,6 +55,9 @@ smart_abbrev_map = {
   {"N"    , "ℕ"},
   {"R"    , "ℝ"},
   {"Z"    , "ℤ"},
+  {"T"    , "𝕋"},
+  {"P"    , "ℙ"},
+  {"S"    , "𝕊"},
 
   -- Numbers
   {"0", "𝟢"},
@@ -62,6 +68,7 @@ smart_abbrev_map = {
   {"sub1"   , "₁"},
   {"sub01"  , "₀₁"},
   {"sub12"  , "₁₂"},
+  {"^-1"    , "⁻¹"},
   {"sub2"   , "₂"},
   {"sub3"   , "₃"},
   {"sub4"   , "₄"},
@@ -123,6 +130,7 @@ smart_abbrev_map = {
   {"^7" , "⁷"},
   {"^8" , "⁸"},
   {"^9" , "⁹"},
+  {"^i" , "ⁱ"},
 
   -- Math
   {":="           , "≔"},
@@ -175,13 +183,14 @@ smart_abbrev_map = {
   {"~>"           , "⇝"},
   {"->>"          , "⇾"},
 
-  -- Brackets
+  -- Brackets and bars
   {"leftangle" , "⟨"},
   {"<"         , "⟨"},
   {"rightangle", "⟩"},
   {">"         , "⟩"},
   {"<|"        , "⟪"},
   {"|>"        , "⟫"},
+  {"||"        , "‖"},
 
   -- Miscelaneous
   {"up"            , "↑"},

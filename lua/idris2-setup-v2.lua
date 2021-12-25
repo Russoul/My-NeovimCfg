@@ -139,16 +139,17 @@ lspconfig.idris2_lsp.setup {
   end,
   autostart = true,
   handlers = {
-    ['workspace/semanticTokens/refresh'] = function(err, method, params, client_id, bufnr, config)
+    ['workspace/semanticTokens/refresh'] = function(err, params, ctx, config)
       if autostart_semantic_highlightning then
         vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
           { textDocument = vim.lsp.util.make_text_document_params() }, nil)
       end
       return vim.NIL
     end,
-    ['textDocument/semanticTokens/full'] = function(err, method, result, client_id, bufnr, config)
+    ['textDocument/semanticTokens/full'] = function(err, result, ctx, config)
       -- temporary handler until native support lands
-      local client = vim.lsp.get_client_by_id(client_id)
+      local bufnr = ctx.bufnr
+      local client = vim.lsp.get_client_by_id(ctx.client_id)
       local legend = client.server_capabilities.semanticTokensProvider.legend
       local token_types = legend.tokenTypes
       local data = result.data

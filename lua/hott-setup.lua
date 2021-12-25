@@ -1,6 +1,6 @@
 local lspconfig = require('lspconfig')
-local configs = require('lspconfig/configs')
-if not lspconfig.hott_lsp then
+local configs = require('lspconfig.configs')
+if not configs.hott_lsp then
   configs.hott_lsp = {
     default_config = {
       cmd = {'hott-lsp'}; -- if not available in PATH, provide the absolute path
@@ -29,17 +29,18 @@ lspconfig.hott_lsp.setup {
   end,
   autostart = true,
   handlers = {
-    ['workspace/semanticTokens/refresh'] = function(err, method, params, client_id, bufnr, config)
+    ['workspace/semanticTokens/refresh'] = function(err, result, ctx, config)
       if autostart_semantic_highlightning then
         vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
           { textDocument = vim.lsp.util.make_text_document_params() }, nil)
       end
       return vim.NIL
     end,
-    ['textDocument/semanticTokens/full'] = function(err, method, result, client_id, bufnr, config)
+    ['textDocument/semanticTokens/full'] = function(err, result, ctx, config)
       if not result then return end
       -- temporary handler until native support lands
-      local client = vim.lsp.get_client_by_id(client_id)
+      local bufnr = ctx.bufnr
+      local client = vim.lsp.get_client_by_id(ctx.client_id)
       local legend = client.server_capabilities.semanticTokensProvider.legend
       local token_types = legend.tokenTypes
       local data = result.data
@@ -70,15 +71,96 @@ vim.cmd [[highlight link HOTTSemantic_ref Identifier]] -- Functions names
 vim.cmd [[highlight HOTTSemantic_var guifg=gray]] -- Bound variables
 vim.cmd [[highlight link HOTTSemantic_keyword Structure]]  -- Keywords
 vim.cmd [[highlight HOTTSemantic_comment guifg=#99ccff]]  -- Comments
-vim.cmd [[highlight link HOTTSemantic_meta Conditional]]  -- Holes
+vim.cmd [[highlight link HOTTSemantic_unsolved_meta Keyword]]  -- Holes
+vim.cmd [[highlight link HOTTSemantic_solved_meta Character]]  -- Holes
 
 function HottInfer(expr)
   vim.lsp.buf_request(0, "workspace/executeCommand", {command = "infer",
-    arguments = {expr}}, function(err, method, result, client_id, bufnr, config)
+    arguments = {expr}}, function(err, result, context, config)
       print(result)
       vim.fn.setreg('x', result)
   end)
 end
+
+function HottNormaliseSelection()
+  local arg = vim.lsp.util.make_given_range_params()
+  local data = {{uri = arg.textDocument.uri, range = arg.range}}
+  -- print(vim.inspect(data))
+  vim.lsp.buf_request(0, "workspace/executeCommand",
+   { command = "normaliseSelection",
+     arguments = data}
+   , function(err, result, context, config)
+       -- print(result)
+       vim.lsp.handlers.hover(err, {contents = result, range = arg.range}, context, config)
+     end)
+end
+
+function HottInferSelection()
+  local arg = vim.lsp.util.make_given_range_params()
+  local data = {{uri = arg.textDocument.uri, range = arg.range}}
+  -- print(vim.inspect(data))
+  vim.lsp.buf_request(0, "workspace/executeCommand",
+   { command = "inferSelection",
+     arguments = data}
+   , function(err, result, context, config)
+       -- print(result)
+       vim.lsp.handlers.hover(err, {contents = result, range = arg.range}, context, config)
+       vim.fn.setreg('x', result)
+     end)
+end
+
+function HottApplySigmaContract()
+  local arg = vim.lsp.util.make_given_range_params()
+  local data = {{uri = arg.textDocument.uri, range = arg.range}}
+  -- print(vim.inspect(data))
+  vim.lsp.buf_request(0, "workspace/executeCommand",
+   { command = "sigmaContractSelection",
+     arguments = data}
+   , function(err, result, context, config)
+       -- print(result)
+       vim.lsp.handlers.hover(err, {contents = result, range = arg.range}, context, config)
+     end)
+end
+
+function HottApplySigmaExpand()
+  local arg = vim.lsp.util.make_given_range_params()
+  local data = {{uri = arg.textDocument.uri, range = arg.range}}
+  -- print(vim.inspect(data))
+  vim.lsp.buf_request(0, "workspace/executeCommand",
+   { command = "sigmaExpandSelection",
+     arguments = data}
+   , function(err, result, context, config)
+       -- print(result)
+       vim.lsp.handlers.hover(err, {contents = result, range = arg.range}, context, config)
+     end)
+end
+
+function HottApplyEquiv(ruleName)
+  local arg = vim.lsp.util.make_given_range_params()
+  local data = {{expression = ruleName, uri = arg.textDocument.uri, range = arg.range}}
+  -- print(vim.inspect(data))
+  vim.lsp.buf_request(0, "workspace/executeCommand",
+   { command = "applyEquivSelection",
+     arguments = data}
+   , function(err, result, context, config)
+       -- print(result)
+       vim.lsp.handlers.hover(err, {contents = result, range = arg.range}, context, config)
+     end)
+end
+
+function HottApplyEqual(ruleName, toFlip)
+  local arg = vim.lsp.util.make_given_range_params()
+  local data = {{expression = ruleName, bool = toFlip, uri = arg.textDocument.uri, range = arg.range}}
+  -- print(vim.inspect(data))
+  vim.lsp.buf_request(0, "workspace/executeCommand",
+   { command = "applyEqualSelection",
+     arguments = data}
+   , function(err, result, context, config)
+       -- print(result)
+       vim.lsp.handlers.hover(err, {contents = result, range = arg.range}, context, config)
+     end)
+end
+
 
 function GetVisuallySelectedText()
   local s = vim.api.nvim_buf_get_mark(0, "<")
@@ -97,9 +179,51 @@ function GetVisuallySelectedText()
   return buildup
 end
 
+function HottInferInContext(expr)
+  local arg = vim.lsp.util.make_position_params()
+  local data = {{expression = expr, uri = arg.textDocument.uri, position = arg.position}}
+  -- print(vim.inspect(data))
+  vim.lsp.buf_request(0, "workspace/executeCommand",
+   { command = "inferInContext",
+     arguments = data}
+   , function(err, result, context, config)
+       print(result)
+       vim.fn.setreg('x', result)
+     end)
+end
+
+function HottContextInfo()
+  local arg = vim.lsp.util.make_position_params()
+  local data = {{expression = "", uri = arg.textDocument.uri, position = arg.position}}
+  -- print(vim.inspect(data))
+  vim.lsp.buf_request(0, "workspace/executeCommand",
+   { command = "contextInfo",
+     arguments = data}
+   , function(err, result, context, config)
+       print(result)
+       vim.fn.setreg('x', result)
+     end)
+end
+
+function HottFillSelection(expr)
+  local arg = vim.lsp.util.make_given_range_params()
+  local data = {{expression = expr, uri = arg.textDocument.uri, range = arg.range}}
+  -- print(vim.inspect(data))
+  vim.lsp.buf_request(0, "workspace/executeCommand",
+   { command = "fillSelection",
+     arguments = data}
+   , function(err, result, context, config)
+       print(result)
+       vim.fn.setreg('x', result)
+     end)
+end
+
 -- execute visually selected code block (HOTT)
 vim.api.nvim_set_keymap('v', '<C-x><C-e>t', ':lua GetVisuallySelectedText()<CR>',
                         {noremap = true, silent = true})
 
 vim.api.nvim_set_keymap('v', '<C-x><C-e>hi', ':lua HottInfer(GetVisuallySelectedText())<CR>',
+                        {noremap = true, silent = true})
+
+vim.api.nvim_set_keymap('v', '<localleader>i', '<esc>:lua HottInferSelection()<CR>',
                         {noremap = true, silent = true})

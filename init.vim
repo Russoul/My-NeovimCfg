@@ -24,13 +24,14 @@ set wildmenu
 set wildmode=list
 set history=200
 " Set path to your preferred shell here
-set shell=/Users/russoul/.nix-profile/bin/fish
+set shell=/opt/homebrew/bin/fish
 set updatetime=100 "Time period at the end of which the swap file is being writen to disk.
 set inccommand=nosplit " Previews changes done in interactive commands
 " Allow up to 3 signs to be rendered simultaneously
 set signcolumn=auto:3
 " Highlight on yank (vanity)
 au TextYankPost * lua vim.highlight.on_yank {higroup="IncSearch", timeout=100, on_visual=true}
+let g:python3_host_prog = '/usr/bin/python3'
 
 vmap <C-a> <Nop>
 " God bless this next line.
@@ -52,11 +53,12 @@ endif
 
 "Plugin configuration start
 call plug#begin()
+Plug 'https://github.com/Shougo/deol.nvim'
 " A theme
 Plug 'https://github.com/rakr/vim-one'
 " Idris 2 integration
 " Edwin's original plugin. Used here for syntax highlighting only
-Plug 'https://github.com/edwinb/idris2-vim'
+" Plug 'https://github.com/edwinb/idris2-vim'
 " A git plugin
 Plug 'tpope/vim-fugitive'
 " Align lines of code in one command with many options of doing it
@@ -74,11 +76,12 @@ Plug 'kyazdani42/nvim-tree.lua'
 Plug 'https://github.com/joshdick/onedark.vim.git'
 " Renders a special line at the bottom of each window that reflects user info
 " (programmable, Neovim 0.5, Lua)
-Plug 'https://github.com/shadmansaleh/lualine.nvim.git'
+Plug 'nvim-lualine/lualine.nvim'
 " Motions defined for moving around camel-case words
 Plug 'https://github.com/bkad/CamelCaseMotion.git'
 " Nice when you can't keep up with your cursor movements all around the frame
 " (Dims all windows except the one the cursor is currently in)
+" TODO: Try getting by without this one?
 Plug 'https://github.com/blueyed/vim-diminactive.git'
 " Self-explanatory
 Plug 'https://github.com/JamshedVesuna/vim-markdown-preview.git'
@@ -90,7 +93,7 @@ Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }
 Plug 'sonph/onehalf', {'rtp': 'vim/'}
 " Create and manage terminal instances in Vim
 " TODO: Find a replacement for this one, favourably targeting Neovim 0.5, Lua
-Plug 'kassio/neoterm'
+" Plug 'kassio/neoterm'
 " Colourful parentheses
 Plug 'luochen1990/rainbow'
 " LSP configs
@@ -105,17 +108,22 @@ Plug 'nvim-telescope/telescope.nvim'
 " Icons
 Plug 'kyazdani42/nvim-web-devicons'
 " Manage git workflow
-Plug 'pwntester/octo.nvim'
+" Plug 'pwntester/octo.nvim'
 " Successor of Signify for Neovim 0.5, Lua
 Plug 'lewis6991/gitsigns.nvim'
 " In-buffer highlighting of colour codes
-Plug 'norcalli/nvim-colorizer.lua'
+" Plug 'norcalli/nvim-colorizer.lua'
 " Stand-in for EasyMotion based on Neovim 0.5, Lua
 Plug 'phaazon/hop.nvim'
 " Stand-in for VimSneak (works differently) targeting Neovim 0.5, Lua
 Plug 'ggandor/lightspeed.nvim'
 "
 Plug 'folke/todo-comments.nvim'
+Plug 'ShinKage/idris2-nvim'
+Plug 'MunifTanjim/nui.nvim'
+Plug 'derekelkins/agda-vim'
+Plug 'akinsho/toggleterm.nvim'
+Plug 'notomo/cmdbuf.nvim'
 " Plugin configuration end
 call plug#end()
 
@@ -416,7 +424,7 @@ nnoremap <C-u> <C-^>
 execute("source " . g:main_config_file_dir . "/config/window_manip.vim")
 
 " Open an existing terminal instance in the current window.
-nnoremap <silent> <C-w>t :Topen<CR>
+nnoremap <silent> <C-w>t :ToggleTerm<CR>
 
 function! s:jumpInBufH(prev, jumpId, thisBuf, jumps, count)
   if a:jumpId <= 0 || a:jumpId >= len(a:jumps)
@@ -474,19 +482,41 @@ local configs = require('lspconfig/configs')
 
 require("lightspeed-setup")
 require("gitsigns-setup")
-require("colorizer").setup()
+-- require("colorizer").setup()
 require("hop").setup{create_hl_autocmd = true}
 require("nvim-web-devicons").setup{default = true}
 require("telescope-setup")
 -- require("idris2-setup")
-require("idris2-setup-v2")
+-- require("idris2-setup-v2")
 require("smart-abbrev-setup")
 require("hott-setup")
 require("lualine-setup")
 require("kommentary-setup")
-require("octo-setup")
+-- require("octo-setup")
 require("todo-comments-setup")
 require("nvim-tree").setup{}
+local opts = {
+  client = {
+    hover = {
+      use_split = false, -- Persistent split instead of popups for hover
+      with_history = true, -- Show history of hovers instead of only last
+    },
+  },
+  server = {}, -- Options passed to lspconfig idris2 configuration
+  hover_split_position = 'right', -- bottom, top, left or right
+  autostart_semantic = true, -- Should start and refresh semantic highlight automatically
+}
+require('idris2').setup(opts)
+require('toggleterm').setup{
+  shade_terminals = false
+}
+vim.cmd [[highlight link LspSemantic_type Include]]   -- Type constructors
+vim.cmd [[highlight link LspSemantic_function Identifier]] -- Functions names
+vim.cmd [[highlight link LspSemantic_enumMember Number]]   -- Data constructors
+vim.cmd [[highlight LspSemantic_variable guifg=Gray]] -- Bound variables
+vim.cmd [[highlight link LspSemantic_keyword Structure]]  -- Keywords
+vim.cmd [[highlight LspSemantic_postulate guifg=Red]]  -- Postulates
+vim.cmd [[highlight link LspSemantic_module Import]]
 
 vim.api.nvim_set_keymap('n', '<LocalLeader>j', ':lua vim.lsp.buf.definition()<CR>',
                         {noremap = true, silent = false})
@@ -502,3 +532,45 @@ vim.api.nvim_set_keymap('n', '[d', ':lua vim.lsp.diagnostic.goto_prev()<CR>',
                         {noremap = true, silent = false})
 
 EOF
+
+" ============== CMDBUF ================
+
+nnoremap q: <Cmd>lua require('cmdbuf').split_open(vim.o.cmdwinheight)<CR>
+cnoremap <C-f> <Cmd>lua require('cmdbuf').split_open(vim.o.cmdwinheight, {line = vim.fn.getcmdline(), column = vim.fn.getcmdpos()})<CR><C-c>
+
+" Custom buffer mappings
+augroup cmdbuf_setting
+  autocmd!
+  autocmd User CmdbufNew call s:cmdbuf()
+augroup END
+function! s:cmdbuf() abort
+  nnoremap <nowait> <buffer> q <Cmd>quit<CR>
+  nnoremap <buffer> dd <Cmd>lua require('cmdbuf').delete()<CR>
+endfunction
+
+" open lua command-line window
+nnoremap ql <Cmd>lua require('cmdbuf').split_open( vim.o.cmdwinheight, {type = "lua/cmd"})<CR>
+
+nnoremap <C-x>x <Cmd>lua require('cmdbuf').execute()<CR>
+
+" q/, q? alternative
+nnoremap q/ <Cmd>lua require('cmdbuf').split_open(
+  \ vim.o.cmdwinheight,
+  \ {type = "vim/search/forward"}
+  \ )<CR>
+nnoremap q? <Cmd>lua require('cmdbuf').split_open(
+  \ vim.o.cmdwinheight,
+  \ {type = "vim/search/backward"}
+  \ )<CR>
+
+" ======================================
+
+" ;, repeat the last lightspeed motion
+let g:lightspeed_last_motion = ''
+augroup lightspeed_last_motion
+autocmd!
+autocmd User LightspeedSxEnter let g:lightspeed_last_motion = 'sx'
+autocmd User LightspeedFtEnter let g:lightspeed_last_motion = 'ft'
+augroup end
+map <expr> ; g:lightspeed_last_motion == 'sx' ? "<Plug>Lightspeed_;_sx" : "<Plug>Lightspeed_;_ft"
+map <expr> , g:lightspeed_last_motion == 'sx' ? "<Plug>Lightspeed_,_sx" : "<Plug>Lightspeed_,_ft"

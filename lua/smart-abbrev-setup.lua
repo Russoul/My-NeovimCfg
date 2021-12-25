@@ -16,12 +16,13 @@ local function esc(x)
 end
 
 -- Small test suite:
--- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek capital Theta") = "Greek capital ϴ", -3
--- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek small eta") = "Greek small η", -1
--- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek small \eta") = "Greek small η", -1
+-- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek capital Theta") = 5, "ϴ"
+-- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek small eta") = 3, "η"
+-- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek small \eta") = 4, "η"
 -- SubstLongestMatchRightToLeft({{"eta", "η"}, {"Theta", "ϴ"}}, "Greek small beta") = nil
 function SubstLongestMatchRightToLeft(abbrev_list, txt)
   local longestLength = 0
+  local theKey = ""
   local toSubst = ""
   for _, abbrev in ipairs(abbrev_list) do
     local key = abbrev[1]
@@ -30,15 +31,16 @@ function SubstLongestMatchRightToLeft(abbrev_list, txt)
     if m and #m > longestLength then
       longestLength = #m
       toSubst = subst
+      theKey = key
     end
   end
   if toSubst ~= "" then
+    local toRemoveLen = #theKey
     local upToMatch = txt:sub(0, -(longestLength + 1))
     if upToMatch:sub(#upToMatch, #upToMatch) == smart_abbrev_delim then
-      upToMatch = upToMatch:sub(0, -2)
+      toRemoveLen = toRemoveLen + 1
     end
-    local newLine = upToMatch .. toSubst
-    return newLine, #toSubst - longestLength
+    return toRemoveLen, toSubst
   else
     return nil
   end
@@ -58,11 +60,10 @@ function SmartAbbrevExpand()
     vim.fn.echom("Can't expand: getline | getpos returned nil")
   else
     local upToCursor = lineTxt:sub(0, col)
-    local upToCursorExpanded, dif = SubstLongestMatchRightToLeft(smart_abbrev_map, upToCursor)
-    if upToCursorExpanded then
-      local expandedLine = upToCursorExpanded .. lineTxt:sub(col + 1)
-      vim.fn.setline('.', expandedLine)
-      vim.fn.setpos('.', {buf, line, col + dif, offset})
+    local toRemoveLen, subst = SubstLongestMatchRightToLeft(smart_abbrev_map, upToCursor)
+    if toRemoveLen then
+      vim.api.nvim_buf_set_text(buf, line - 1, col - toRemoveLen, line - 1, col, {subst})
+      vim.fn.setpos('.', {buf, line, col - toRemoveLen + #subst, offset})
     end
   end
 end
