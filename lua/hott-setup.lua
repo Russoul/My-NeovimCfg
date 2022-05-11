@@ -66,13 +66,15 @@ lspconfig.hott_lsp.setup {
   },
 }
 
-vim.cmd [[highlight link HOTTSemantic_universe Include]]   -- Type constructors
-vim.cmd [[highlight link HOTTSemantic_ref Identifier]] -- Functions names
-vim.cmd [[highlight HOTTSemantic_var guifg=gray]] -- Bound variables
+vim.cmd [[highlight link HOTTSemantic_typ Include]]   -- Type constructors
+vim.cmd [[highlight link HOTTSemantic_let_var Identifier]] -- Functions names
+vim.cmd [[highlight HOTTSemantic_bound_var guifg=gray]] -- Bound variables
 vim.cmd [[highlight link HOTTSemantic_keyword Structure]]  -- Keywords
 vim.cmd [[highlight HOTTSemantic_comment guifg=#99ccff]]  -- Comments
-vim.cmd [[highlight link HOTTSemantic_unsolved_meta Keyword]]  -- Holes
+vim.cmd [[highlight link HOTTSemantic_unsolved_meta Question]]  -- Holes
 vim.cmd [[highlight link HOTTSemantic_solved_meta Character]]  -- Holes
+vim.cmd [[highlight link HOTTSemantic_elim Identifier]]
+vim.cmd [[highlight link HOTTSemantic_elem String]]
 
 function HottInfer(expr)
   vim.lsp.buf_request(0, "workspace/executeCommand", {command = "infer",

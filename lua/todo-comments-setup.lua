@@ -14,7 +14,9 @@ require("todo-comments").setup
     HACK = { icon = " ", color = "warning" },
     WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
     PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
+    REFACTOR = { icon = "", color = "warning", alt = { "REFACTOR" } },
     NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
+    IDEA = { icon = "", color = "#10A010", alt = { "THOUGHT" } },
   },
   merge_keywords = true, -- when true, custom keywords will be merged with the defaults
   -- highlighting of the line containing the todo comment

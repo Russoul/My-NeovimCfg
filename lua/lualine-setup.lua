@@ -1,5 +1,5 @@
 function unicode_location()
-  return vim.fn.line('.') .. ":" .. vim.fn.virtcol('.')
+  return vim.fn.line('.') .. ":" .. vim.fn.virtcol('.') .. "/" .. vim.fn.col('.')
 end
 
 -- Eviline config for lualine
