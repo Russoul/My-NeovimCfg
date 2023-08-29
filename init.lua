@@ -63,6 +63,10 @@ end
 -- -- TODO: use packer instead
 -- Plugin configuration start
 vim.cmd[[call plug#begin()]]
+-- Latex plugin
+vim.cmd[[Plug 'lervag/vimtex']]
+-- Interprets ansi codes in a buffer.
+vim.cmd[[Plug 'm00qek/baleia.nvim', { 'tag': 'v1.2.0' }]]
 vim.cmd[[Plug 'https://github.com/Shougo/deol.nvim']]
 -- A theme
 vim.cmd[[Plug 'https://github.com/rakr/vim-one']]
@@ -136,10 +140,12 @@ vim.cmd[[Plug 'akinsho/toggleterm.nvim']]
 vim.cmd[[Plug 'notomo/cmdbuf.nvim']]
 vim.cmd[[Plug 'fedepujol/move.nvim']]
 vim.cmd[[Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }]]
-vim.cmd[[Plug 'iamcco/markdown-preview.nvim']]
+vim.cmd[[Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }]]
 -- Plugin for telescope that allows one to seach for an emoji
 vim.cmd[[Plug 'xiyaowong/telescope-emoji.nvim']]
 -- Plugin configuration end
+vim.cmd[[Plug 'simrat39/rust-tools.nvim']]
+vim.cmd[[Plug 'scalameta/nvim-metals']]
 vim.cmd[[call plug#end()]]
 
 -- Highlight on yank (vanity)
@@ -201,7 +207,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = "vim,idris2,python,javascript,lua,c,hott,txt,agda",
+    pattern = "vim,idris2,python,javascript,lua,c,hott,nova,txt,agda",
     callback = function(args)
       vim.o.number = true
     end,
@@ -228,6 +234,14 @@ vim.api.nvim_create_autocmd({"BufNewFile","BufRead", "BufEnter"}, {
       vim.bo.filetype = "hott"
     end,
     desc = "Assigns a file type to files with .hott extension.",
+})
+
+vim.api.nvim_create_autocmd({"BufNewFile","BufRead", "BufEnter"}, {
+    pattern = {"*.nova"},
+    callback = function(args)
+      vim.bo.filetype = "nova"
+    end,
+    desc = "Assigns a file type to files with .nova extension.",
 })
 
 vim.api.nvim_create_autocmd("BufNewFile,BufRead", {
@@ -370,7 +384,7 @@ vim.cmd[[cnoremap <silent> <C-x>ff :Telescope fd<CR>]]
 vim.cmd[[tnoremap <silent> <C-x>ff <C-\><C-n>:Telescope fd<CR>]]
 
 -- Find files in the folder storing all Idris 2 source files
-vim.cmd[[command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.idris2/idris2-0.5.1"}})]]
+vim.cmd[[command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.idris2/idris2-0.6.0"}})]]
 vim.cmd[[nnoremap <silent> <C-x>fi :FilesIdr<CR>]]
 vim.cmd[[cnoremap <silent> <C-x>fi :FilesIdr<CR>]]
 vim.cmd[[tnoremap <silent> <C-x>fi <C-\><C-n>:FilesIdr<CR>]]
@@ -401,9 +415,9 @@ vim.cmd[[execute("source " . g:main_config_file_dir . "/config/jumping.vim")]]
 vim.cmd[[nnoremap <silent> <Space><C-I> :call JumpNextInBuf()<CR>]]
 vim.cmd[[nnoremap <silent> <Space><C-O> :call JumpPrevInBuf()<CR>]]
 
-vim.cmd[[nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.1"}})<CR>]]
-vim.cmd[[cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.1"}})<CR>]]
-vim.cmd[[tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.5.1"}})<CR>]]
+vim.cmd[[nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.6.0"}})<CR>]]
+vim.cmd[[cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.6.0"}})<CR>]]
+vim.cmd[[tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.6.0"}})<CR>]]
 
 vim.cmd[[nnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>]]
 vim.cmd[[cnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>]]
@@ -411,6 +425,27 @@ vim.cmd[[tnoremap <silent> <C-x>ll <C-\><C-n>:lua require("telescope.builtin").l
 
 local lspconfig = require('lspconfig')
 local configs = require('lspconfig/configs')
+--[[ lspconfig.rust_analyzer.setup {
+  -- Server-specific settings. See `:help lspconfig-setup`
+  settings = {
+    ['rust-analyzer'] = {},
+  },
+} ]]
+
+local rt = require("rust-tools")
+
+rt.setup({
+  server = {
+    on_attach = function(_, bufnr)
+      -- Hover actions
+      vim.keymap.set("n", "<LocalLeader>a", rt.hover_actions.hover_actions, { buffer = bufnr })
+      -- Code action groups
+      vim.keymap.set("n", "<LocalLeader>b", rt.code_action_group.code_action_group, { buffer = bufnr })
+    end,
+  },
+})
+
+require'lspconfig'.metals.setup{}
 
 require('bufferline').setup {
   options = { mode = "tabs", numbers = "ordinal" }
@@ -439,6 +474,7 @@ require("telescope").load_extension("emoji")
 -- require("idris2-setup-v2")
 require("smart-abbrev-setup")
 require("hott-setup")
+require("nova-setup")
 require("lualine-setup")
 require("kommentary-setup")
 -- require("octo-setup")
@@ -620,13 +656,13 @@ vim.api.nvim_set_keymap('n', '<LocalLeader>j', ':lua vim.lsp.buf.definition()<CR
                         {noremap = true, silent = false})
 vim.api.nvim_set_keymap('n', '<LocalLeader>h', ':lua vim.lsp.buf.hover()<CR>',
                         {noremap = true, silent = false})
-vim.api.nvim_set_keymap('n', '<LocalLeader>a', ':Telescope lsp_code_actions<CR>',
+vim.api.nvim_set_keymap('n', '<LocalLeader>a', ':lua vim.lsp.buf.code_action()<CR>',
                         {noremap = true, silent = false})
 vim.api.nvim_set_keymap('n', '<LocalLeader>d', ':lua vim.lsp.buf.signature_help()<CR>',
                         {noremap = true, silent = false})
-vim.api.nvim_set_keymap('n', ']d', ':lua vim.lsp.diagnostic.goto_next()<CR>',
+vim.api.nvim_set_keymap('n', ']d', ':lua vim.diagnostic.goto_next()<CR>',
                         {noremap = true, silent = false})
-vim.api.nvim_set_keymap('n', '[d', ':lua vim.lsp.diagnostic.goto_prev()<CR>',
+vim.api.nvim_set_keymap('n', '[d', ':lua vim.diagnostic.goto_prev()<CR>',
                         {noremap = true, silent = false})
 
 -- ============== CMDBUF ================
@@ -698,3 +734,7 @@ require("toggleterm").setup{
 vim.cmd[[silent! call repeat#set("<Left><C-o>:lua SmartAbbrevExpand()<CR><Right>", v:count)]]
 
 require'lspconfig'.jsonls.setup{}
+
+--
+vim.cmd[[let s:baleia = luaeval("require('baleia').setup { }")
+         command! BaleiaColorize call s:baleia.once(bufnr('%'))]]
