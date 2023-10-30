@@ -1,3 +1,6 @@
+-- SUPPORTED NVIM VERSION: 0.9.1
+
+
 local g = vim.g
 local o = vim.o
 local api = vim.api
@@ -49,7 +52,7 @@ o.signcolumn = 'auto:3'
 -- Keep undo history after exit
 if vim.fn.has('persistent_undo') == 1 then
   vim.o.undofile = true
-  vim.o.undodir="/Users/russoul/.config/nvim/undo"
+  vim.o.undodir="/Users/feizerakhmanov/.config/nvim/undo"
 end
 -- ----------------------------
 
@@ -64,88 +67,91 @@ end
 -- Plugin configuration start
 vim.cmd[[call plug#begin()]]
 -- Latex plugin
-vim.cmd[[Plug 'lervag/vimtex']]
+vim.cmd[[Plug 'lervag/vimtex', {'commit' : '534fd725f2475a9083b032e402c7e73b8a3fc6bb'}]]
 -- Interprets ansi codes in a buffer.
 vim.cmd[[Plug 'm00qek/baleia.nvim', { 'tag': 'v1.2.0' }]]
-vim.cmd[[Plug 'https://github.com/Shougo/deol.nvim']]
+vim.cmd[[Plug 'https://github.com/Shougo/deol.nvim', {'commit' : '51d2367d3373457327e583819c00381387b8c51e'}]]
 -- A theme
-vim.cmd[[Plug 'https://github.com/rakr/vim-one']]
+vim.cmd[[Plug 'https://github.com/rakr/vim-one', {'commit' : '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
 -- Draws a box over the outline of the selection
-vim.cmd[[Plug 'jbyuki/venn.nvim']]
+vim.cmd[[Plug 'jbyuki/venn.nvim', {'commit' : 'c114563960b8fb1197695d42798d1f3e7190b798'}]]
 -- Idris 2 integration
 -- Edwin's original plugin. Used here for syntax highlighting only
 -- Plug 'https://github.com/edwinb/idris2-vim'
 -- A git plugin
-vim.cmd[[Plug 'tpope/vim-fugitive']]
+vim.cmd[[Plug 'tpope/vim-fugitive', {'commit' : '572c8510123cbde02e8a1dafcd376c98e1e13f43'}]]
+vim.cmd[[Plug 'shumphrey/fugitive-gitlab.vim']]
 -- Align lines of code in one command with many options of doing it
-vim.cmd[[Plug 'godlygeek/tabular']]
+vim.cmd[[Plug 'godlygeek/tabular', {'commit' : '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
 -- Commenting code (Neovim 0.5, Lua)
-vim.cmd[[Plug 'b3nj5m1n/kommentary']]
+vim.cmd[[Plug 'b3nj5m1n/kommentary', {'commit' : '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
 -- Surrounding text with delimiters
-vim.cmd[[Plug 'https://tpope.io/vim/surround.git']]
+vim.cmd[[Plug 'https://tpope.io/vim/surround.git', {'commit' : '3d188ed2113431cf8dac77be61b842acb64433d9'}]]
 -- Repeating complex commands; often plugins require
 -- this as a dependency in order for the repeat (.) to work properly
-vim.cmd[[Plug 'https://tpope.io/vim/repeat.git']]
+vim.cmd[[Plug 'https://tpope.io/vim/repeat.git', {'commit' : '24afe922e6a05891756ecf331f39a1f6743d3d5a'}]]
 -- Nice directory tree view (Neovim 0.5, Lua)
-vim.cmd[[Plug 'kyazdani42/nvim-tree.lua']]
+vim.cmd[[Plug 'kyazdani42/nvim-tree.lua', {'commit' : '00741206c2df9c4b538055def19b99790f0c95c8'}]]
 -- The best theme ever (subjectively of course) !
-vim.cmd[[Plug 'https://github.com/joshdick/onedark.vim.git']]
+vim.cmd[[Plug 'https://github.com/joshdick/onedark.vim.git', {'commit' : '57b77747694ea5676c3ca0eeaf9567dc499730c0'}]]
 -- Renders a special line at the bottom of each window that reflects user info
 -- (programmable, Neovim 0.5, Lua)
-vim.cmd[[Plug 'nvim-lualine/lualine.nvim']]
+vim.cmd[[Plug 'nvim-lualine/lualine.nvim', {'commit' : '45e27ca739c7be6c49e5496d14fcf45a303c3a63'}]]
 -- Motions defined for moving around camel-case words
-vim.cmd[[Plug 'https://github.com/bkad/CamelCaseMotion.git']]
+vim.cmd[[Plug 'https://github.com/bkad/CamelCaseMotion.git', {'commit' : 'de439d7c06cffd0839a29045a103fe4b44b15cdc'}]]
 -- Nice when you can't keep up with your cursor movements all around the frame
 -- (Dims all windows except the one the cursor is currently in)
 -- TODO: Try getting by without this one?
-vim.cmd[[Plug 'https://github.com/blueyed/vim-diminactive.git']]
+vim.cmd[[Plug 'https://github.com/blueyed/vim-diminactive.git', {'commit' : '6f2e14e6ff6a038285937c378ec3685e6ff7ee36'}]]
 -- Async completion framework
-vim.cmd[[Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }]]
+vim.cmd[[Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' , 'commit' : '62dd0192786a4e2429c60b29e16f8390bd65060d'}]]
 -- Pretty smart general completion (though not nearly as smart as they claim)
-vim.cmd[[Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' }]]
+vim.cmd[[Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' , 'commit' : '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
 
-vim.cmd[[Plug 'sonph/onehalf', {'rtp': 'vim/'}]]
+vim.cmd[[Plug 'sonph/onehalf', {'rtp': 'vim/', 'commit' : '75eb2e97acd74660779fed8380989ee7891eec56'}]]
 -- Create and manage terminal instances in Vim
 -- TODO: Find a replacement for this one, favourably targeting Neovim 0.5, Lua
 -- Plug 'kassio/neoterm'
 -- Colourful parentheses
-vim.cmd[[Plug 'luochen1990/rainbow']]
+vim.cmd[[Plug 'luochen1990/rainbow', {'commit' : '61f719aebe0dc5c3048330c50db72cfee1afdd34'}]]
 -- LSP configs
-vim.cmd[[Plug 'neovim/nvim-lspconfig']]
+vim.cmd[[Plug 'neovim/nvim-lspconfig', {'commit' : 'a27356f1ef9c11e1f459cc96a3fcac5c265e72d6'}]]
 -- Plug 'gwerbin/nvim-lspconfig', {'branch': 'gwerbin/idris2-lsp'}
 -- Used by Telescope
-vim.cmd[[Plug 'nvim-lua/popup.nvim']]
+vim.cmd[[Plug 'nvim-lua/popup.nvim', {'commit' : 'b7404d35d5d3548a82149238289fa71f7f6de4ac'}]]
 -- Used by many plugins
-vim.cmd[[Plug 'nvim-lua/plenary.nvim']]
+vim.cmd[[Plug 'nvim-lua/plenary.nvim', {'commit' : '0dbe561ae023f02c2fb772b879e905055b939ce3'}]]
 -- Handles (multiple) choice generically & comes with a few useful finders
-vim.cmd[[Plug 'nvim-telescope/telescope.nvim']]
+vim.cmd[[Plug 'nvim-telescope/telescope.nvim', {'commit' : '1dfa66b845673effc8771f9ebe511bb36a09f560'}]]
 -- Icons
-vim.cmd[[Plug 'kyazdani42/nvim-web-devicons']]
+vim.cmd[[Plug 'kyazdani42/nvim-web-devicons', {'commit' : 'cfc8824cc1db316a276b36517f093baccb8e799a'}]]
 -- Manage git workflow
 -- Plug 'pwntester/octo.nvim'
 -- Successor of Signify for Neovim 0.5, Lua
-vim.cmd[[Plug 'lewis6991/gitsigns.nvim']]
+vim.cmd[[Plug 'lewis6991/gitsigns.nvim', {'commit' : 'd8590288417fef2430f85bc8b312fae8b1cf2c40'}]]
 -- In-buffer highlighting of colour codes
 -- Plug 'norcalli/nvim-colorizer.lua'
 -- Stand-in for EasyMotion based on Neovim 0.5, Lua
-vim.cmd[[Plug 'phaazon/hop.nvim']]
+vim.cmd[[Plug 'phaazon/hop.nvim', {'commit' : '03f0434869f1f38868618198b5f4f2ab6d39aef2'}]]
 -- Stand-in for VimSneak (works differently) targeting Neovim 0.5, Lua
-vim.cmd[[Plug 'ggandor/lightspeed.nvim']]
+vim.cmd[[Plug 'ggandor/lightspeed.nvim', {'commit' : '299eefa6a9e2d881f1194587c573dad619fdb96f'}]]
 --
-vim.cmd[[Plug 'folke/todo-comments.nvim']]
-vim.cmd[[Plug 'ShinKage/idris2-nvim', {'branch' : 'better-repl'}]]
-vim.cmd[[Plug 'MunifTanjim/nui.nvim']]
-vim.cmd[[Plug 'derekelkins/agda-vim']]
-vim.cmd[[Plug 'akinsho/toggleterm.nvim']]
-vim.cmd[[Plug 'notomo/cmdbuf.nvim']]
-vim.cmd[[Plug 'fedepujol/move.nvim']]
+vim.cmd[[Plug 'folke/todo-comments.nvim', {'commit' : '3094ead8edfa9040de2421deddec55d3762f64d1'}]]
+vim.cmd[[Plug 'ShinKage/idris2-nvim', {'branch' : 'main', 'commit' : '8bff02984a33264437e70fd9fff4359679d910da'}]]
+vim.cmd[[Plug 'MunifTanjim/nui.nvim', {'commit' : '0f913a3ae1a24c8a4487fbf111b4044cc22b1b0d'}]]
+vim.cmd[[Plug 'derekelkins/agda-vim', {'commit' : '4a0f475aaef756702222bdd5b01e25f814f5691f'}]]
+vim.cmd[[Plug 'akinsho/toggleterm.nvim', {'commit' : '12cba0a1967b4f3f31903484dec72a6100dcf515'}]]
+vim.cmd[[Plug 'notomo/cmdbuf.nvim', {'commit' : 'facbf09bf037ffd5df5293db8e736db569bf4627'}]]
+vim.cmd[[Plug 'fedepujol/move.nvim', {'commit' : 'd663b74b4e38f257aae757541c9076b8047844d6'}]]
 vim.cmd[[Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }]]
 vim.cmd[[Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }]]
 -- Plugin for telescope that allows one to seach for an emoji
-vim.cmd[[Plug 'xiyaowong/telescope-emoji.nvim']]
+vim.cmd[[Plug 'xiyaowong/telescope-emoji.nvim', {'commit' : '86248d97be84a1ce83f0541500ef9edc99ea2aa1'}]]
 -- Plugin configuration end
-vim.cmd[[Plug 'simrat39/rust-tools.nvim']]
-vim.cmd[[Plug 'scalameta/nvim-metals']]
+vim.cmd[[Plug 'simrat39/rust-tools.nvim', {'commit' : '0cc8adab23117783a0292a0c8a2fbed1005dc645'}]]
+vim.cmd[[Plug 'scalameta/nvim-metals', {'commit' : '57cff9a240f3337129188997887d8848fe6022ad'}]]
+vim.cmd[[Plug 'folke/trouble.nvim', {'commit' : '3f85d8ed30e97ceeddbbcf80224245d347053711'}]]
+vim.cmd[[Plug 'FabijanZulj/blame.nvim', {'commit' : '3e6b2ef4905982cd7d26eb5b18b0e761138eb5ab'}]]
 vim.cmd[[call plug#end()]]
 
 -- Highlight on yank (vanity)
@@ -207,7 +213,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = "vim,idris2,python,javascript,lua,c,hott,nova,txt,agda",
+    pattern = "vim,idris2,python,javascript,lua,c,hott,nova,txt,agda,scala",
     callback = function(args)
       vim.o.number = true
     end,
@@ -445,7 +451,18 @@ rt.setup({
   },
 })
 
-require'lspconfig'.metals.setup{}
+-- require'lspconfig'.metals.setup{}
+
+local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "scala", "sbt", "java" },
+  callback = function()
+    require("metals").initialize_or_attach({})
+  end,
+  group = nvim_metals_group,
+})
+metals_config = require("metals").bare_config()
+metals_config.init_options.statusBarProvider = "on"
 
 require('bufferline').setup {
   options = { mode = "tabs", numbers = "ordinal" }
@@ -479,154 +496,13 @@ require("lualine-setup")
 require("kommentary-setup")
 -- require("octo-setup")
 require("todo-comments-setup")
-require'nvim-tree'.setup { -- BEGIN_DEFAULT_OPTS
-  auto_reload_on_write = true,
-  disable_netrw = false,
-  hijack_cursor = false,
-  hijack_netrw = true,
-  hijack_unnamed_buffer_when_opening = false,
-  ignore_buffer_on_setup = false,
-  open_on_setup = false,
-  open_on_setup_file = false,
-  open_on_tab = false,
-  sort_by = "name",
-  update_cwd = false,
-  view = {
-    width = 30,
-    height = 30,
-    hide_root_folder = false,
-    side = "left",
-    preserve_window_proportions = false,
-    number = false,
-    relativenumber = false,
-    signcolumn = "yes",
-    mappings = {
-      custom_only = true,
-      list = {
-          { key = {"<CR>", "o", "<2-LeftMouse>"}, action = "edit" },
-          { key = {"O"},                          action = "edit_no_picker" },
-          { key = {"<2-RightMouse>", "<C-]>"},    action = "cd" },
-          { key = "<C-t>",                        action = "tabnew" },
-          { key = "<",                            action = "prev_sibling" },
-          { key = ">",                            action = "next_sibling" },
-          { key = "P",                            action = "parent_node" },
-          { key = "<BS>",                         action = "close_node" },
-          { key = "<Tab>",                        action = "preview" },
-          { key = "K",                            action = "first_sibling" },
-          { key = "J",                            action = "last_sibling" },
-          { key = "I",                            action = "toggle_git_ignored" },
-          { key = "H",                            action = "toggle_dotfiles" },
-          { key = "R",                            action = "refresh" },
-          { key = "a",                            action = "create" },
-          { key = "d",                            action = "remove" },
-          { key = "D",                            action = "trash" },
-          { key = "r",                            action = "rename" },
-          { key = "<C-r>",                        action = "full_rename" },
-          { key = "x",                            action = "cut" },
-          { key = "c",                            action = "copy" },
-          { key = "p",                            action = "paste" },
-          { key = "y",                            action = "copy_name" },
-          { key = "Y",                            action = "copy_path" },
-          { key = "gy",                           action = "copy_absolute_path" },
-          { key = "[c",                           action = "prev_git_item" },
-          { key = "]c",                           action = "next_git_item" },
-          { key = "-",                            action = "dir_up" },
-          { key = "s",                            action = "system_open" },
-          { key = "q",                            action = "close" },
-          { key = "g?",                           action = "toggle_help" },
-          { key = "W",                            action = "collapse_all" },
-          { key = "S",                            action = "search_node" },
-          { key = "<C-k>",                        action = "toggle_file_info" },
-          { key = ".",                            action = "run_file_command" }
-        -- user mappings go here
-      },
-    },
-  },
-  renderer = {
-    indent_markers = {
-      enable = false,
-      icons = {
-        corner = "└ ",
-        edge = "│ ",
-        none = "  ",
-      },
-    },
-    icons = {
-      webdev_colors = true,
-      git_placement = "before",
-    }
-  },
-  hijack_directories = {
-    enable = true,
-    auto_open = true,
-  },
-  update_focused_file = {
-    enable = false,
-    update_cwd = false,
-    ignore_list = {},
-  },
-  ignore_ft_on_setup = {},
-  system_open = {
-    cmd = "",
-    args = {},
-  },
-  diagnostics = {
-    enable = false,
-    show_on_dirs = false,
-    icons = {
-      hint = "",
-      info = "",
-      warning = "",
-      error = "",
-    },
-  },
-  filters = {
-    dotfiles = false,
-    custom = {},
-    exclude = {},
-  },
-  git = {
-    enable = true,
-    ignore = true,
-    timeout = 400,
-  },
-  actions = {
-    use_system_clipboard = true,
-    change_dir = {
-      enable = true,
-      global = false,
-      restrict_above_cwd = false,
-    },
-    open_file = {
-      quit_on_open = false,
-      resize_window = false,
-      window_picker = {
-        enable = true,
-        chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
-        exclude = {
-          filetype = { "notify", "packer", "qf", "diff", "fugitive", "fugitiveblame" },
-          buftype = { "nofile", "terminal", "help" },
-        },
-      },
-    },
-  },
-  trash = {
-    cmd = "trash",
-    require_confirm = true,
-  },
-  log = {
-    enable = false,
-    truncate = false,
-    types = {
-      all = false,
-      config = false,
-      copy_paste = false,
-      diagnostics = false,
-      git = false,
-      profile = false,
-    },
-  },
-} -- END_DEFAULT_OPTS
+
+-- disable netrw at the very start of your init.lua
+-- vim.g.loaded_netrw = 1
+-- vim.g.loaded_netrwPlugin = 1
+
+-- set termguicolors to enable highlight groups
+vim.opt.termguicolors = true
 
 -- require("high-str-setup")
 local opts = {
@@ -659,6 +535,8 @@ vim.api.nvim_set_keymap('n', '<LocalLeader>h', ':lua vim.lsp.buf.hover()<CR>',
 vim.api.nvim_set_keymap('n', '<LocalLeader>a', ':lua vim.lsp.buf.code_action()<CR>',
                         {noremap = true, silent = false})
 vim.api.nvim_set_keymap('n', '<LocalLeader>d', ':lua vim.lsp.buf.signature_help()<CR>',
+                        {noremap = true, silent = false})
+vim.api.nvim_set_keymap('n', '<LocalLeader>f', ':lua vim.lsp.buf.format()<CR>',
                         {noremap = true, silent = false})
 vim.api.nvim_set_keymap('n', ']d', ':lua vim.diagnostic.goto_next()<CR>',
                         {noremap = true, silent = false})
@@ -738,3 +616,132 @@ require'lspconfig'.jsonls.setup{}
 --
 vim.cmd[[let s:baleia = luaeval("require('baleia').setup { }")
          command! BaleiaColorize call s:baleia.once(bufnr('%'))]]
+
+-- NVim Tree
+--
+local function nvim_tree_my_on_attach(bufnr)
+  local api = require "nvim-tree.api"
+
+  local function opts(desc)
+    return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+  end
+  -- BEGIN_DEFAULT_ON_ATTACH
+  vim.keymap.set('n', '<C-]>', api.tree.change_root_to_node,          opts('CD'))
+  vim.keymap.set('n', '<C-k>', api.node.show_info_popup,              opts('Info'))
+  vim.keymap.set('n', '<C-r>', api.fs.rename_sub,                     opts('Rename: Omit Filename'))
+  vim.keymap.set('n', '<C-t>', api.node.open.tab,                     opts('Open: New Tab'))
+  vim.keymap.set('n', '<C-v>', api.node.open.vertical,                opts('Open: Vertical Split'))
+  vim.keymap.set('n', '<C-x>', api.node.open.horizontal,              opts('Open: Horizontal Split'))
+  vim.keymap.set('n', '<BS>',  api.node.navigate.parent_close,        opts('Close Directory'))
+  vim.keymap.set('n', '<CR>',  api.node.open.edit,                    opts('Open'))
+  vim.keymap.set('n', '<Tab>', api.node.open.preview,                 opts('Open Preview'))
+  vim.keymap.set('n', '>',     api.node.navigate.sibling.next,        opts('Next Sibling'))
+  vim.keymap.set('n', '<',     api.node.navigate.sibling.prev,        opts('Previous Sibling'))
+  vim.keymap.set('n', '.',     api.node.run.cmd,                      opts('Run Command'))
+  vim.keymap.set('n', '-',     api.tree.change_root_to_parent,        opts('Up'))
+  vim.keymap.set('n', 'a',     api.fs.create,                         opts('Create'))
+  vim.keymap.set('n', 'bd',    api.marks.bulk.delete,                 opts('Delete Bookmarked'))
+  vim.keymap.set('n', 'bmv',   api.marks.bulk.move,                   opts('Move Bookmarked'))
+  vim.keymap.set('n', 'B',     api.tree.toggle_no_buffer_filter,      opts('Toggle Filter: No Buffer'))
+  vim.keymap.set('n', 'c',     api.fs.copy.node,                      opts('Copy'))
+  vim.keymap.set('n', 'C',     api.tree.toggle_git_clean_filter,      opts('Toggle Filter: Git Clean'))
+  vim.keymap.set('n', '[c',    api.node.navigate.git.prev,            opts('Prev Git'))
+  vim.keymap.set('n', ']c',    api.node.navigate.git.next,            opts('Next Git'))
+  vim.keymap.set('n', 'd',     api.fs.remove,                         opts('Delete'))
+  vim.keymap.set('n', 'D',     api.fs.trash,                          opts('Trash'))
+  vim.keymap.set('n', 'E',     api.tree.expand_all,                   opts('Expand All'))
+  vim.keymap.set('n', 'e',     api.fs.rename_basename,                opts('Rename: Basename'))
+  vim.keymap.set('n', ']e',    api.node.navigate.diagnostics.next,    opts('Next Diagnostic'))
+  vim.keymap.set('n', '[e',    api.node.navigate.diagnostics.prev,    opts('Prev Diagnostic'))
+  vim.keymap.set('n', 'F',     api.live_filter.clear,                 opts('Clean Filter'))
+  vim.keymap.set('n', 'f',     api.live_filter.start,                 opts('Filter'))
+  vim.keymap.set('n', 'g?',    api.tree.toggle_help,                  opts('Help'))
+  vim.keymap.set('n', 'gy',    api.fs.copy.absolute_path,             opts('Copy Absolute Path'))
+  vim.keymap.set('n', 'H',     api.tree.toggle_hidden_filter,         opts('Toggle Filter: Dotfiles'))
+  vim.keymap.set('n', 'I',     api.tree.toggle_gitignore_filter,      opts('Toggle Filter: Git Ignore'))
+  vim.keymap.set('n', 'J',     api.node.navigate.sibling.last,        opts('Last Sibling'))
+  vim.keymap.set('n', 'K',     api.node.navigate.sibling.first,       opts('First Sibling'))
+  vim.keymap.set('n', 'm',     api.marks.toggle,                      opts('Toggle Bookmark'))
+  vim.keymap.set('n', 'o',     api.node.open.edit,                    opts('Open'))
+  vim.keymap.set('n', 'O',     api.node.open.no_window_picker,        opts('Open: No Window Picker'))
+  vim.keymap.set('n', 'p',     api.fs.paste,                          opts('Paste'))
+  vim.keymap.set('n', 'P',     api.node.navigate.parent,              opts('Parent Directory'))
+  vim.keymap.set('n', 'q',     api.tree.close,                        opts('Close'))
+  vim.keymap.set('n', 'r',     api.fs.rename,                         opts('Rename'))
+  vim.keymap.set('n', 'R',     api.tree.reload,                       opts('Refresh'))
+  vim.keymap.set('n', 's',     api.node.run.system,                   opts('Run System'))
+  vim.keymap.set('n', 'S',     api.tree.search_node,                  opts('Search'))
+  vim.keymap.set('n', 'U',     api.tree.toggle_custom_filter,         opts('Toggle Filter: Hidden'))
+  vim.keymap.set('n', 'W',     api.tree.collapse_all,                 opts('Collapse'))
+  vim.keymap.set('n', 'x',     api.fs.cut,                            opts('Cut'))
+  vim.keymap.set('n', 'y',     api.fs.copy.filename,                  opts('Copy Name'))
+  vim.keymap.set('n', 'Y',     api.fs.copy.relative_path,             opts('Copy Relative Path'))
+  vim.keymap.set('n', '<2-LeftMouse>',  api.node.open.edit,           opts('Open'))
+  vim.keymap.set('n', '<2-RightMouse>', api.tree.change_root_to_node, opts('CD'))
+end
+
+--
+require("nvim-tree").setup{
+  on_attach = nvim_tree_my_on_attach,
+  diagnostics = {
+    enable = true,
+  }
+}
+
+require("trouble").setup{
+    position = "bottom", -- position of the list can be: bottom, top, left, right
+    height = 10, -- height of the trouble list when position is top or bottom
+    width = 50, -- width of the list when position is left or right
+    icons = true, -- use devicons for filenames
+    mode = "workspace_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
+    severity = nil, -- nil (ALL) or vim.diagnostic.severity.ERROR | WARN | INFO | HINT
+    fold_open = "", -- icon used for open folds
+    fold_closed = "", -- icon used for closed folds
+    group = true, -- group results by file
+    padding = true, -- add an extra new line on top of the list
+    cycle_results = true, -- cycle item list when reaching beginning or end of list
+    action_keys = { -- key mappings for actions in the trouble list
+        -- map to {} to remove a mapping, for example:
+        -- close = {},
+        close = "q", -- close the list
+        cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
+        refresh = "r", -- manually refresh
+        jump = { "<cr>", "<tab>", "<2-leftmouse>" }, -- jump to the diagnostic or open / close folds
+        open_split = { "<c-x>" }, -- open buffer in new split
+        open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
+        open_tab = { "<c-t>" }, -- open buffer in new tab
+        jump_close = {"o"}, -- jump to the diagnostic and close the list
+        toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
+        switch_severity = "s", -- switch "diagnostics" severity filter level to HINT / INFO / WARN / ERROR
+        toggle_preview = "P", -- toggle auto_preview
+        hover = "K", -- opens a small popup with the full multiline message
+        preview = "p", -- preview the diagnostic location
+        open_code_href = "c", -- if present, open a URI with more information about the diagnostic error
+        close_folds = {"zM", "zm"}, -- close all folds
+        open_folds = {"zR", "zr"}, -- open all folds
+        toggle_fold = {"zA", "za"}, -- toggle fold of current file
+        previous = "i", -- previous item
+        next = "k", -- next item
+        help = "?" -- help menu
+    },
+    multiline = true, -- render multi-line messages
+    indent_lines = true, -- add an indent guide below the fold icons
+    win_config = { border = "single" }, -- window configuration for floating windows. See |nvim_open_win()|.
+    auto_open = false, -- automatically open the list when you have diagnostics
+    auto_close = false, -- automatically close the list when you have no diagnostics
+    auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
+    auto_fold = false, -- automatically fold a file trouble list at creation
+    auto_jump = {"lsp_definitions"}, -- for the given modes, automatically jump if there is only a single result
+    include_declaration = { "lsp_references", "lsp_implementations", "lsp_definitions"  }, -- for the given modes, include the declaration of the current symbol in the results
+    signs = {
+      -- icons / text used for a diagnostic
+      error = "",
+      warning = "",
+      hint = "",
+      information = "",
+      other = "",
+    },
+    use_diagnostic_signs = false -- enabling this will use the signs defined in your lsp client
+}
+
+g.fugitive_gitlab_domains = {'https://gitlab.onairent.live'}

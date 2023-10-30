@@ -82,6 +82,16 @@ local function ins_right(component)
   table.insert(config.sections.lualine_x, component)
 end
 
+local function ins_both_left(component)
+  table.insert(config.sections.lualine_c, component)
+  table.insert(config.inactive_sections.lualine_c, component)
+end
+
+local function ins_both_right(component)
+  table.insert(config.sections.lualine_x, component)
+  table.insert(config.inactive_sections.lualine_c, component)
+end
+
 ins_left {
   function()
     return '▊'
@@ -123,21 +133,22 @@ ins_left {
   padding = { right = 1 },
 }
 
-ins_left {
+ins_both_left {
   -- filesize component
   'filesize',
   cond = conditions.buffer_not_empty,
 }
 
-ins_left {
+ins_both_left {
   'filename',
+  path = 1,
   cond = conditions.buffer_not_empty,
   color = { fg = colors.magenta, gui = 'bold' },
 }
 
-ins_left { unicode_location }
+ins_both_left { unicode_location }
 
-ins_left { 'progress', color = { fg = colors.fg, gui = 'bold' } }
+ins_both_left { 'progress', color = { fg = colors.fg, gui = 'bold' } }
 
 ins_left {
   'diagnostics',
