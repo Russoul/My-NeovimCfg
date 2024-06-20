@@ -1,5 +1,0 @@
-vim.api.nvim_set_keymap('n', '<space><space>l', "<cmd>HopLine<cr>", {})
-vim.api.nvim_set_keymap('n', '<space><space>w', "<cmd>HopWord<cr>", {})
-vim.api.nvim_set_keymap('n', '<space><space>c1', "<cmd>HopChar1<cr>", {})
-vim.api.nvim_set_keymap('n', '<space><space>c2', "<cmd>HopChar2<cr>", {})
-vim.api.nvim_set_keymap('n', '<space><space>/', "<cmd>HopPattern<cr>", {})
