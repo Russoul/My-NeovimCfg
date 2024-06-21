@@ -15,6 +15,7 @@ vim.cmd[[nnoremap <C-x>cf :e $MYVIMRC<CR>]]
 -- writing unicode to clipboard (the `+` register)
 vim.env.LANG = 'en_US.UTF-8'
 
+-- A keymap for openning the init.lua file from anywhere
 api.nvim_set_keymap (
   'n',
   '<C-x>f',
@@ -52,105 +53,90 @@ o.signcolumn = 'auto:3'
 -- Keep undo history after exit
 if vim.fn.has('persistent_undo') == 1 then
   vim.o.undofile = true
-  vim.o.undodir="/Users/feizerakhmanov/.config/nvim/undo"
+  vim.o.undodir="/Users/russoul/.config/nvim/undo"
 end
 -- ----------------------------
 
--- Sidenote:
--- Use neovim-remote !
--- nvr --remote
--- opens a file in the running neovim instance
--- UPDATE: seems like the project has been dead
--- -------------
-
--- -- TODO: use packer instead
+-- TODO: Maybe use packer instead?
 -- Plugin configuration start
 vim.cmd[[call plug#begin()]]
 -- Latex plugin
-vim.cmd[[Plug 'lervag/vimtex', {'commit' : '534fd725f2475a9083b032e402c7e73b8a3fc6bb'}]]
--- Interprets ansi codes in a buffer.
-vim.cmd[[Plug 'm00qek/baleia.nvim', { 'tag': 'v1.2.0' }]]
-vim.cmd[[Plug 'https://github.com/Shougo/deol.nvim', {'commit' : '51d2367d3373457327e583819c00381387b8c51e'}]]
+vim.cmd[[Plug 'lervag/vimtex', { 'tag': 'v2.15' }]]
 -- A theme
-vim.cmd[[Plug 'https://github.com/rakr/vim-one', {'commit' : '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
+vim.cmd[[Plug 'https://github.com/rakr/vim-one', {'commit': '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
 -- Draws a box over the outline of the selection
-vim.cmd[[Plug 'jbyuki/venn.nvim', {'commit' : 'c114563960b8fb1197695d42798d1f3e7190b798'}]]
--- Idris 2 integration
--- Edwin's original plugin. Used here for syntax highlighting only
--- Plug 'https://github.com/edwinb/idris2-vim'
+vim.cmd[[Plug 'jbyuki/venn.nvim', {'commit': '71856b548e3206e33bad10acea294ca8b44327ee'}]]
 -- A git plugin
-vim.cmd[[Plug 'tpope/vim-fugitive', {'commit' : '572c8510123cbde02e8a1dafcd376c98e1e13f43'}]]
-vim.cmd[[Plug 'shumphrey/fugitive-gitlab.vim']]
+vim.cmd[[Plug 'tpope/vim-fugitive', {'commit': 'f529acef74b4266d94f22414c60b4a8930c1e0f3'}]]
 -- Align lines of code in one command with many options of doing it
-vim.cmd[[Plug 'godlygeek/tabular', {'commit' : '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
--- Commenting code (Neovim 0.5, Lua)
-vim.cmd[[Plug 'b3nj5m1n/kommentary', {'commit' : '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
+vim.cmd[[Plug 'godlygeek/tabular', {'commit': 'f529acef74b4266d94f22414c60b4a8930c1e0f3'}]]
+-- Commenting code
+vim.cmd[[Plug 'numToStr/Comment.nvim']]
 -- Surrounding text with delimiters
-vim.cmd[[Plug 'https://tpope.io/vim/surround.git', {'commit' : '3d188ed2113431cf8dac77be61b842acb64433d9'}]]
+vim.cmd[[Plug 'https://tpope.io/vim/surround.git', {'commit': 'bf3480dc9ae7bea34c78fbba4c65b4548b5b1fea'}]]
 -- Repeating complex commands; often plugins require
 -- this as a dependency in order for the repeat (.) to work properly
-vim.cmd[[Plug 'https://tpope.io/vim/repeat.git', {'commit' : '24afe922e6a05891756ecf331f39a1f6743d3d5a'}]]
--- Nice directory tree view (Neovim 0.5, Lua)
-vim.cmd[[Plug 'kyazdani42/nvim-tree.lua', {'commit' : '00741206c2df9c4b538055def19b99790f0c95c8'}]]
+vim.cmd[[Plug 'https://tpope.io/vim/repeat.git', {'commit': '24afe922e6a05891756ecf331f39a1f6743d3d5a'}]]
+-- Nice directory tree view
+vim.cmd[[Plug 'kyazdani42/nvim-tree.lua', {'commit': '82ec79aac5557c05728d88195fb0d008cacbf565'}]]
 -- The best theme ever (subjectively of course) !
-vim.cmd[[Plug 'https://github.com/joshdick/onedark.vim.git', {'commit' : '57b77747694ea5676c3ca0eeaf9567dc499730c0'}]]
+vim.cmd[[Plug 'https://github.com/joshdick/onedark.vim.git', {'commit': '7db2ed5b825a311d0f6d12694d4738cf60106dc8'}]]
 -- Renders a special line at the bottom of each window that reflects user info
--- (programmable, Neovim 0.5, Lua)
-vim.cmd[[Plug 'nvim-lualine/lualine.nvim', {'commit' : '45e27ca739c7be6c49e5496d14fcf45a303c3a63'}]]
+vim.cmd[[Plug 'nvim-lualine/lualine.nvim', {'commit': '619ededcff79e33a7e0ea677881dd07957449f9d'}]]
 -- Motions defined for moving around camel-case words
-vim.cmd[[Plug 'https://github.com/bkad/CamelCaseMotion.git', {'commit' : 'de439d7c06cffd0839a29045a103fe4b44b15cdc'}]]
+vim.cmd[[Plug 'https://github.com/bkad/CamelCaseMotion.git', {'commit': 'de439d7c06cffd0839a29045a103fe4b44b15cdc'}]]
 -- Nice when you can't keep up with your cursor movements all around the frame
 -- (Dims all windows except the one the cursor is currently in)
--- TODO: Try getting by without this one?
-vim.cmd[[Plug 'https://github.com/blueyed/vim-diminactive.git', {'commit' : '6f2e14e6ff6a038285937c378ec3685e6ff7ee36'}]]
--- Async completion framework
-vim.cmd[[Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' , 'commit' : '62dd0192786a4e2429c60b29e16f8390bd65060d'}]]
--- Pretty smart general completion (though not nearly as smart as they claim)
-vim.cmd[[Plug 'tbodt/deoplete-tabnine', { 'do': './install.sh' , 'commit' : '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
-
-vim.cmd[[Plug 'sonph/onehalf', {'rtp': 'vim/', 'commit' : '75eb2e97acd74660779fed8380989ee7891eec56'}]]
--- Create and manage terminal instances in Vim
--- TODO: Find a replacement for this one, favourably targeting Neovim 0.5, Lua
--- Plug 'kassio/neoterm'
--- Colourful parentheses
-vim.cmd[[Plug 'luochen1990/rainbow', {'commit' : '61f719aebe0dc5c3048330c50db72cfee1afdd34'}]]
+vim.cmd[[Plug 'https://github.com/blueyed/vim-diminactive.git', {'commit': '6f2e14e6ff6a038285937c378ec3685e6ff7ee36'}]]
 -- LSP configs
-vim.cmd[[Plug 'neovim/nvim-lspconfig', {'commit' : 'a27356f1ef9c11e1f459cc96a3fcac5c265e72d6'}]]
--- Plug 'gwerbin/nvim-lspconfig', {'branch': 'gwerbin/idris2-lsp'}
+vim.cmd[[Plug 'neovim/nvim-lspconfig', {'commit': '2f37b2ca07a3f89e7994b3b7f54c997e2cb3400a'}]]
 -- Used by Telescope
-vim.cmd[[Plug 'nvim-lua/popup.nvim', {'commit' : 'b7404d35d5d3548a82149238289fa71f7f6de4ac'}]]
+vim.cmd[[Plug 'nvim-lua/popup.nvim', {'commit': 'b7404d35d5d3548a82149238289fa71f7f6de4ac'}]]
 -- Used by many plugins
-vim.cmd[[Plug 'nvim-lua/plenary.nvim', {'commit' : '0dbe561ae023f02c2fb772b879e905055b939ce3'}]]
+vim.cmd[[Plug 'nvim-lua/plenary.nvim', {'commit': '9069d14a120cadb4f6825f76821533f2babcab92'}]]
 -- Handles (multiple) choice generically & comes with a few useful finders
-vim.cmd[[Plug 'nvim-telescope/telescope.nvim', {'commit' : '1dfa66b845673effc8771f9ebe511bb36a09f560'}]]
+vim.cmd[[Plug 'nvim-telescope/telescope.nvim', {'commit': '795a63ed293ba249a588e9e67aa1f2cec82028e8'}]]
 -- Icons
-vim.cmd[[Plug 'kyazdani42/nvim-web-devicons', {'commit' : 'cfc8824cc1db316a276b36517f093baccb8e799a'}]]
+vim.cmd[[Plug 'kyazdani42/nvim-web-devicons', {'commit': 'bdd43421437f2ef037e0dafeaaaa62b31d35ef2f'}]]
 -- Manage git workflow
--- Plug 'pwntester/octo.nvim'
+vim.cmd[[Plug 'pwntester/octo.nvim', {'commit': '4de7b07cb0788d69444d8b08d9936a4b3ffced87'}]]
 -- Successor of Signify for Neovim 0.5, Lua
-vim.cmd[[Plug 'lewis6991/gitsigns.nvim', {'commit' : 'd8590288417fef2430f85bc8b312fae8b1cf2c40'}]]
--- In-buffer highlighting of colour codes
--- Plug 'norcalli/nvim-colorizer.lua'
--- Stand-in for EasyMotion based on Neovim 0.5, Lua
-vim.cmd[[Plug 'phaazon/hop.nvim', {'commit' : '03f0434869f1f38868618198b5f4f2ab6d39aef2'}]]
--- Stand-in for VimSneak (works differently) targeting Neovim 0.5, Lua
-vim.cmd[[Plug 'ggandor/lightspeed.nvim', {'commit' : '299eefa6a9e2d881f1194587c573dad619fdb96f'}]]
---
-vim.cmd[[Plug 'folke/todo-comments.nvim', {'commit' : '3094ead8edfa9040de2421deddec55d3762f64d1'}]]
-vim.cmd[[Plug 'ShinKage/idris2-nvim', {'branch' : 'main', 'commit' : '8bff02984a33264437e70fd9fff4359679d910da'}]]
-vim.cmd[[Plug 'MunifTanjim/nui.nvim', {'commit' : '0f913a3ae1a24c8a4487fbf111b4044cc22b1b0d'}]]
-vim.cmd[[Plug 'derekelkins/agda-vim', {'commit' : '4a0f475aaef756702222bdd5b01e25f814f5691f'}]]
-vim.cmd[[Plug 'akinsho/toggleterm.nvim', {'commit' : '12cba0a1967b4f3f31903484dec72a6100dcf515'}]]
-vim.cmd[[Plug 'notomo/cmdbuf.nvim', {'commit' : 'facbf09bf037ffd5df5293db8e736db569bf4627'}]]
-vim.cmd[[Plug 'fedepujol/move.nvim', {'commit' : 'd663b74b4e38f257aae757541c9076b8047844d6'}]]
+vim.cmd[[Plug 'lewis6991/gitsigns.nvim', {'commit': 'aca84fd16ce129965d7c3c69de59f333d9da116c'}]]
+-- Stand-in for VimSneak (works differently)
+vim.cmd[[Plug 'ggandor/leap.nvim']]
+-- Highlights in colour special symbols like:
+--   * TODO:
+--   * NOTE:
+--   * FIX:
+--   * PERF:
+--   * HACK:
+--   * IDEA:
+--   * REFACTOR:
+--   and additionally marks lines with signs
+vim.cmd[[Plug 'folke/todo-comments.nvim']]
+vim.cmd[[Plug 'ShinKage/idris2-nvim', {'branch' : 'better-repl'}]]
+-- UI component library
+vim.cmd[[Plug 'MunifTanjim/nui.nvim', {'commit': 'abdbfab89f307151db83b1a5147cd390ef27ff99'}]]
+vim.cmd[[Plug 'derekelkins/agda-vim']]
+-- Terminal
+vim.cmd[[Plug 'akinsho/toggleterm.nvim', {'commit': '265bbff68fbb8b2a5fb011272ec469850254ec9f'}]]
+-- Buffers that contain past searches and cmds
+vim.cmd[[Plug 'notomo/cmdbuf.nvim', {'commit': 'e6b37e80cab18368d64184557c3a956cafa4ced7'}]]
+-- Tabs at the top of the screen
 vim.cmd[[Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }]]
+-- Preview markdown files
 vim.cmd[[Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }]]
 -- Plugin for telescope that allows one to seach for an emoji
 vim.cmd[[Plug 'xiyaowong/telescope-emoji.nvim', {'commit' : '86248d97be84a1ce83f0541500ef9edc99ea2aa1'}]]
 -- Plugin configuration end
-vim.cmd[[Plug 'simrat39/rust-tools.nvim', {'commit' : '0cc8adab23117783a0292a0c8a2fbed1005dc645'}]]
-vim.cmd[[Plug 'scalameta/nvim-metals', {'commit' : '57cff9a240f3337129188997887d8848fe6022ad'}]]
+vim.cmd[[Plug 'simrat39/rust-tools.nvim']]
+-- Metals LSP client for scala lang
+vim.cmd[[Plug 'scalameta/nvim-metals']]
+-- Plugin that enables fugitive's GBrowse open links to private repos?
+vim.cmd[[Plug 'https://github.com/tpope/vim-rhubarb']]
+-- A buffer for showing diagnostics, references, telescope results, quickfix and location lists
 vim.cmd[[Plug 'folke/trouble.nvim', {'commit' : '3f85d8ed30e97ceeddbbcf80224245d347053711'}]]
+-- Show git blame
 vim.cmd[[Plug 'FabijanZulj/blame.nvim', {'commit' : '3e6b2ef4905982cd7d26eb5b18b0e761138eb5ab'}]]
 vim.cmd[[call plug#end()]]
 
@@ -164,8 +150,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 g.python3_host_prog = '/usr/bin/python3'
-
-g.rainbow_active = false
 
 -- --------------------------------
 -- Set theme and cursor shape/color
@@ -390,7 +374,7 @@ vim.cmd[[cnoremap <silent> <C-x>ff :Telescope fd<CR>]]
 vim.cmd[[tnoremap <silent> <C-x>ff <C-\><C-n>:Telescope fd<CR>]]
 
 -- Find files in the folder storing all Idris 2 source files
-vim.cmd[[command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.idris2/idris2-0.6.0"}})]]
+vim.cmd[[command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.idris2/idris2-0.7.0"}})]]
 vim.cmd[[nnoremap <silent> <C-x>fi :FilesIdr<CR>]]
 vim.cmd[[cnoremap <silent> <C-x>fi :FilesIdr<CR>]]
 vim.cmd[[tnoremap <silent> <C-x>fi <C-\><C-n>:FilesIdr<CR>]]
@@ -421,9 +405,9 @@ vim.cmd[[execute("source " . g:main_config_file_dir . "/config/jumping.vim")]]
 vim.cmd[[nnoremap <silent> <Space><C-I> :call JumpNextInBuf()<CR>]]
 vim.cmd[[nnoremap <silent> <Space><C-O> :call JumpPrevInBuf()<CR>]]
 
-vim.cmd[[nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.6.0"}})<CR>]]
-vim.cmd[[cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.6.0"}})<CR>]]
-vim.cmd[[tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.6.0"}})<CR>]]
+vim.cmd[[nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.7.0"}})<CR>]]
+vim.cmd[[cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.7.0"}})<CR>]]
+vim.cmd[[tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.7.0"}})<CR>]]
 
 vim.cmd[[nnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>]]
 vim.cmd[[cnoremap <silent> <C-x>ll :lua require("telescope.builtin").live_grep()<CR>]]
@@ -451,8 +435,6 @@ rt.setup({
   },
 })
 
--- require'lspconfig'.metals.setup{}
-
 local nvim_metals_group = vim.api.nvim_create_augroup("nvim-metals", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "scala", "sbt", "java" },
@@ -463,6 +445,8 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 metals_config = require("metals").bare_config()
 metals_config.init_options.statusBarProvider = "on"
+
+require'lspconfig'.clangd.setup{}
 
 require('bufferline').setup {
   options = { mode = "tabs", numbers = "ordinal" }
@@ -480,10 +464,8 @@ vim.cmd[[nnoremap <silent><mymap> :BufferLineMovePrev<CR>]]
 -- These commands will sort buffers by directory, language, or a custom criteria
 vim.cmd[[nnoremap <silent><mymap> :lua require'bufferline'.sort_buffers_by(function (buf_a, buf_b) return buf_a.id < buf_b.id end)<CR>]]
 
-require("lightspeed-setup")
 require("gitsigns-setup")
 -- require("colorizer").setup()
-require("hop").setup{create_hl_autocmd = true}
 require("nvim-web-devicons").setup{default = true}
 require("telescope-setup")
 require("telescope").load_extension("emoji")
@@ -493,8 +475,7 @@ require("smart-abbrev-setup")
 require("hott-setup")
 require("nova-setup")
 require("lualine-setup")
-require("kommentary-setup")
--- require("octo-setup")
+require("octo-setup")
 require("todo-comments-setup")
 
 -- disable netrw at the very start of your init.lua
@@ -538,6 +519,8 @@ vim.api.nvim_set_keymap('n', '<LocalLeader>d', ':lua vim.lsp.buf.signature_help(
                         {noremap = true, silent = false})
 vim.api.nvim_set_keymap('n', '<LocalLeader>f', ':lua vim.lsp.buf.format()<CR>',
                         {noremap = true, silent = false})
+vim.api.nvim_set_keymap('n', '<LocalLeader>i', ':lua vim.lsp.buf.implementation()<CR>',
+                        {noremap = true, silent = false})
 vim.api.nvim_set_keymap('n', ']d', ':lua vim.diagnostic.goto_next()<CR>',
                         {noremap = true, silent = false})
 vim.api.nvim_set_keymap('n', '[d', ':lua vim.diagnostic.goto_prev()<CR>',
@@ -575,30 +558,7 @@ vim.cmd[[nnoremap q? <Cmd>lua require('cmdbuf').split_open(
 
 -- ======================================
 
--- ;, repeat the last lightspeed motion
-vim.g.lightspeed_last_motion = ''
-
-vim.api.nvim_create_autocmd("User", {
-    pattern = "LightspeedSxEnter",
-    callback = function(args)
-      vim.g.lightspeed_last_motion = 'sx'
-    end,
-    desc = "Lightspeed tricks.",
-})
-
-vim.api.nvim_create_autocmd("User", {
-    pattern = "LightspeedFtEnter",
-    callback = function(args)
-      vim.g.lightspeed_last_motion = 'ft'
-    end,
-    desc = "Lightspeed tricks.",
-})
-
-vim.cmd[[map <expr> , g:lightspeed_last_motion == 'sx' ? "<Plug>Lightspeed_;_sx" : "<Plug>Lightspeed_;_ft"]]
-vim.cmd[[map <expr> , g:lightspeed_last_motion == 'sx' ? "<Plug>Lightspeed_,_sx" : "<Plug>Lightspeed_,_ft"]]
-
-vim.api.nvim_set_keymap('n', '<C-k>', ":MoveLine(1)<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<C-i>', ":MoveLine(-1)<CR>", { noremap = true, silent = true })
+require("move")
 vim.api.nvim_set_keymap('v', '<C-k>', ":lua moveSelectionDown()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '<C-i>', ":lua moveSelectionUp()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '<C-l>', ":lua moveSelectionRight()<CR>", { noremap = true, silent = true })
@@ -613,9 +573,6 @@ vim.cmd[[silent! call repeat#set("<Left><C-o>:lua SmartAbbrevExpand()<CR><Right>
 
 require'lspconfig'.jsonls.setup{}
 
---
-vim.cmd[[let s:baleia = luaeval("require('baleia').setup { }")
-         command! BaleiaColorize call s:baleia.once(bufnr('%'))]]
 
 -- NVim Tree
 --
@@ -687,6 +644,38 @@ require("nvim-tree").setup{
     enable = true,
   }
 }
+
+require('Comment').setup()
+
+---------- LEAP -------------
+
+require('leap').create_default_mappings()
+
+-- The below settings make Leap's highlighting closer to what you've been
+-- used to in Lightspeed.
+
+vim.api.nvim_set_hl(0, 'LeapBackdrop', { link = 'Comment' }) -- or some grey
+vim.api.nvim_set_hl(0, 'LeapMatch', {
+  -- For light themes, set to 'black' or similar.
+  fg = 'white', bold = true, nocombine = true,
+})
+
+-- Lightspeed colors
+-- primary labels: bg = "#f02077" (light theme) or "#ff2f87"  (dark theme)
+-- secondary labels: bg = "#399d9f" (light theme) or "#99ddff" (dark theme)
+-- shortcuts: bg = "#f00077", fg = "white"
+-- You might want to use either the primary label or the shortcut colors
+-- for Leap primary labels, depending on your taste.
+vim.api.nvim_set_hl(0, 'LeapLabelPrimary', {
+  fg = 'red', bold = true, nocombine = true,
+})
+vim.api.nvim_set_hl(0, 'LeapLabelSecondary', {
+  fg = 'blue', bold = true, nocombine = true,
+})
+-- Try it without this setting first, you might find you don't even miss it.
+-- require('leap').opts.highlight_unlabeled_phase_one_targets = true
+
+-----------------------------
 
 require("trouble").setup{
     position = "bottom", -- position of the list can be: bottom, top, left, right
