@@ -89,7 +89,7 @@ vim.cmd[[Plug 'https://github.com/bkad/CamelCaseMotion.git', {'commit': 'de439d7
 -- (Dims all windows except the one the cursor is currently in)
 vim.cmd[[Plug 'https://github.com/blueyed/vim-diminactive.git', {'commit': '6f2e14e6ff6a038285937c378ec3685e6ff7ee36'}]]
 -- LSP configs
-vim.cmd[[Plug 'neovim/nvim-lspconfig', {'commit': '2f37b2ca07a3f89e7994b3b7f54c997e2cb3400a'}]]
+vim.cmd[[Plug 'neovim/nvim-lspconfig', {'commit': 'f43135c38a37c588053ad5e209c7460f43f6340c'}]]
 -- Used by Telescope
 vim.cmd[[Plug 'nvim-lua/popup.nvim', {'commit': 'b7404d35d5d3548a82149238289fa71f7f6de4ac'}]]
 -- Used by many plugins
@@ -114,9 +114,9 @@ vim.cmd[[Plug 'ggandor/leap.nvim']]
 --   * REFACTOR:
 --   and additionally marks lines with signs
 vim.cmd[[Plug 'folke/todo-comments.nvim', {'commit': '98b1ebf198836bdc226c0562b9f906584e6c400e'}]]
-vim.cmd[[Plug 'ShinKage/idris2-nvim', {'branch' : 'better-repl'}]]
+vim.cmd[[Plug 'ShinKage/idris2-nvim', {'commit': '8bff02984a33264437e70fd9fff4359679d910da'}]]
 -- UI component library
-vim.cmd[[Plug 'MunifTanjim/nui.nvim', {'commit': 'abdbfab89f307151db83b1a5147cd390ef27ff99'}]]
+vim.cmd[[Plug 'MunifTanjim/nui.nvim', {'commit': '322978c734866996274467de084a95e4f9b5e0b1'}]]
 vim.cmd[[Plug 'derekelkins/agda-vim']]
 -- Terminal
 vim.cmd[[Plug 'akinsho/toggleterm.nvim', {'commit': '265bbff68fbb8b2a5fb011272ec469850254ec9f'}]]
