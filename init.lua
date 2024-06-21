@@ -69,7 +69,7 @@ vim.cmd[[Plug 'jbyuki/venn.nvim', {'commit': '71856b548e3206e33bad10acea294ca8b4
 -- A git plugin
 vim.cmd[[Plug 'tpope/vim-fugitive', {'commit': 'f529acef74b4266d94f22414c60b4a8930c1e0f3'}]]
 -- Align lines of code in one command with many options of doing it
-vim.cmd[[Plug 'godlygeek/tabular', {'commit': 'f529acef74b4266d94f22414c60b4a8930c1e0f3'}]]
+vim.cmd[[Plug 'godlygeek/tabular', {'commit': '339091ac4dd1f17e225fe7d57b48aff55f99b23a'}]]
 -- Commenting code
 vim.cmd[[Plug 'numToStr/Comment.nvim']]
 -- Surrounding text with delimiters
@@ -78,7 +78,7 @@ vim.cmd[[Plug 'https://tpope.io/vim/surround.git', {'commit': 'bf3480dc9ae7bea34
 -- this as a dependency in order for the repeat (.) to work properly
 vim.cmd[[Plug 'https://tpope.io/vim/repeat.git', {'commit': '24afe922e6a05891756ecf331f39a1f6743d3d5a'}]]
 -- Nice directory tree view
-vim.cmd[[Plug 'kyazdani42/nvim-tree.lua', {'commit': '82ec79aac5557c05728d88195fb0d008cacbf565'}]]
+vim.cmd[[Plug 'kyazdani42/nvim-tree.lua', {'commit': '2086e564c4d23fea714e8a6d63b881e551af2f41'}]]
 -- The best theme ever (subjectively of course) !
 vim.cmd[[Plug 'https://github.com/joshdick/onedark.vim.git', {'commit': '7db2ed5b825a311d0f6d12694d4738cf60106dc8'}]]
 -- Renders a special line at the bottom of each window that reflects user info
@@ -97,11 +97,11 @@ vim.cmd[[Plug 'nvim-lua/plenary.nvim', {'commit': '9069d14a120cadb4f6825f7682153
 -- Handles (multiple) choice generically & comes with a few useful finders
 vim.cmd[[Plug 'nvim-telescope/telescope.nvim', {'commit': '795a63ed293ba249a588e9e67aa1f2cec82028e8'}]]
 -- Icons
-vim.cmd[[Plug 'kyazdani42/nvim-web-devicons', {'commit': 'bdd43421437f2ef037e0dafeaaaa62b31d35ef2f'}]]
+vim.cmd[[Plug 'kyazdani42/nvim-web-devicons', {'commit': 'c0cfc1738361b5da1cd0a962dd6f774cc444f856'}]]
 -- Manage git workflow
 vim.cmd[[Plug 'pwntester/octo.nvim', {'commit': '4de7b07cb0788d69444d8b08d9936a4b3ffced87'}]]
--- Successor of Signify for Neovim 0.5, Lua
-vim.cmd[[Plug 'lewis6991/gitsigns.nvim', {'commit': 'aca84fd16ce129965d7c3c69de59f333d9da116c'}]]
+-- Successor of Signify for Neovim, Lua
+vim.cmd[[Plug 'lewis6991/gitsigns.nvim', {'commit': '0dc886637f9686b7cfd245a4726f93abeab19d4a'}]]
 -- Stand-in for VimSneak (works differently)
 vim.cmd[[Plug 'ggandor/leap.nvim']]
 -- Highlights in colour special symbols like:
@@ -113,7 +113,7 @@ vim.cmd[[Plug 'ggandor/leap.nvim']]
 --   * IDEA:
 --   * REFACTOR:
 --   and additionally marks lines with signs
-vim.cmd[[Plug 'folke/todo-comments.nvim']]
+vim.cmd[[Plug 'folke/todo-comments.nvim', {'commit': '98b1ebf198836bdc226c0562b9f906584e6c400e'}]]
 vim.cmd[[Plug 'ShinKage/idris2-nvim', {'branch' : 'better-repl'}]]
 -- UI component library
 vim.cmd[[Plug 'MunifTanjim/nui.nvim', {'commit': 'abdbfab89f307151db83b1a5147cd390ef27ff99'}]]
@@ -479,8 +479,8 @@ require("octo-setup")
 require("todo-comments-setup")
 
 -- disable netrw at the very start of your init.lua
--- vim.g.loaded_netrw = 1
--- vim.g.loaded_netrwPlugin = 1
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 -- set termguicolors to enable highlight groups
 vim.opt.termguicolors = true
@@ -574,76 +574,8 @@ vim.cmd[[silent! call repeat#set("<Left><C-o>:lua SmartAbbrevExpand()<CR><Right>
 require'lspconfig'.jsonls.setup{}
 
 
--- NVim Tree
---
-local function nvim_tree_my_on_attach(bufnr)
-  local api = require "nvim-tree.api"
-
-  local function opts(desc)
-    return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
-  end
-  -- BEGIN_DEFAULT_ON_ATTACH
-  vim.keymap.set('n', '<C-]>', api.tree.change_root_to_node,          opts('CD'))
-  vim.keymap.set('n', '<C-k>', api.node.show_info_popup,              opts('Info'))
-  vim.keymap.set('n', '<C-r>', api.fs.rename_sub,                     opts('Rename: Omit Filename'))
-  vim.keymap.set('n', '<C-t>', api.node.open.tab,                     opts('Open: New Tab'))
-  vim.keymap.set('n', '<C-v>', api.node.open.vertical,                opts('Open: Vertical Split'))
-  vim.keymap.set('n', '<C-x>', api.node.open.horizontal,              opts('Open: Horizontal Split'))
-  vim.keymap.set('n', '<BS>',  api.node.navigate.parent_close,        opts('Close Directory'))
-  vim.keymap.set('n', '<CR>',  api.node.open.edit,                    opts('Open'))
-  vim.keymap.set('n', '<Tab>', api.node.open.preview,                 opts('Open Preview'))
-  vim.keymap.set('n', '>',     api.node.navigate.sibling.next,        opts('Next Sibling'))
-  vim.keymap.set('n', '<',     api.node.navigate.sibling.prev,        opts('Previous Sibling'))
-  vim.keymap.set('n', '.',     api.node.run.cmd,                      opts('Run Command'))
-  vim.keymap.set('n', '-',     api.tree.change_root_to_parent,        opts('Up'))
-  vim.keymap.set('n', 'a',     api.fs.create,                         opts('Create'))
-  vim.keymap.set('n', 'bd',    api.marks.bulk.delete,                 opts('Delete Bookmarked'))
-  vim.keymap.set('n', 'bmv',   api.marks.bulk.move,                   opts('Move Bookmarked'))
-  vim.keymap.set('n', 'B',     api.tree.toggle_no_buffer_filter,      opts('Toggle Filter: No Buffer'))
-  vim.keymap.set('n', 'c',     api.fs.copy.node,                      opts('Copy'))
-  vim.keymap.set('n', 'C',     api.tree.toggle_git_clean_filter,      opts('Toggle Filter: Git Clean'))
-  vim.keymap.set('n', '[c',    api.node.navigate.git.prev,            opts('Prev Git'))
-  vim.keymap.set('n', ']c',    api.node.navigate.git.next,            opts('Next Git'))
-  vim.keymap.set('n', 'd',     api.fs.remove,                         opts('Delete'))
-  vim.keymap.set('n', 'D',     api.fs.trash,                          opts('Trash'))
-  vim.keymap.set('n', 'E',     api.tree.expand_all,                   opts('Expand All'))
-  vim.keymap.set('n', 'e',     api.fs.rename_basename,                opts('Rename: Basename'))
-  vim.keymap.set('n', ']e',    api.node.navigate.diagnostics.next,    opts('Next Diagnostic'))
-  vim.keymap.set('n', '[e',    api.node.navigate.diagnostics.prev,    opts('Prev Diagnostic'))
-  vim.keymap.set('n', 'F',     api.live_filter.clear,                 opts('Clean Filter'))
-  vim.keymap.set('n', 'f',     api.live_filter.start,                 opts('Filter'))
-  vim.keymap.set('n', 'g?',    api.tree.toggle_help,                  opts('Help'))
-  vim.keymap.set('n', 'gy',    api.fs.copy.absolute_path,             opts('Copy Absolute Path'))
-  vim.keymap.set('n', 'H',     api.tree.toggle_hidden_filter,         opts('Toggle Filter: Dotfiles'))
-  vim.keymap.set('n', 'I',     api.tree.toggle_gitignore_filter,      opts('Toggle Filter: Git Ignore'))
-  vim.keymap.set('n', 'J',     api.node.navigate.sibling.last,        opts('Last Sibling'))
-  vim.keymap.set('n', 'K',     api.node.navigate.sibling.first,       opts('First Sibling'))
-  vim.keymap.set('n', 'm',     api.marks.toggle,                      opts('Toggle Bookmark'))
-  vim.keymap.set('n', 'o',     api.node.open.edit,                    opts('Open'))
-  vim.keymap.set('n', 'O',     api.node.open.no_window_picker,        opts('Open: No Window Picker'))
-  vim.keymap.set('n', 'p',     api.fs.paste,                          opts('Paste'))
-  vim.keymap.set('n', 'P',     api.node.navigate.parent,              opts('Parent Directory'))
-  vim.keymap.set('n', 'q',     api.tree.close,                        opts('Close'))
-  vim.keymap.set('n', 'r',     api.fs.rename,                         opts('Rename'))
-  vim.keymap.set('n', 'R',     api.tree.reload,                       opts('Refresh'))
-  vim.keymap.set('n', 's',     api.node.run.system,                   opts('Run System'))
-  vim.keymap.set('n', 'S',     api.tree.search_node,                  opts('Search'))
-  vim.keymap.set('n', 'U',     api.tree.toggle_custom_filter,         opts('Toggle Filter: Hidden'))
-  vim.keymap.set('n', 'W',     api.tree.collapse_all,                 opts('Collapse'))
-  vim.keymap.set('n', 'x',     api.fs.cut,                            opts('Cut'))
-  vim.keymap.set('n', 'y',     api.fs.copy.filename,                  opts('Copy Name'))
-  vim.keymap.set('n', 'Y',     api.fs.copy.relative_path,             opts('Copy Relative Path'))
-  vim.keymap.set('n', '<2-LeftMouse>',  api.node.open.edit,           opts('Open'))
-  vim.keymap.set('n', '<2-RightMouse>', api.tree.change_root_to_node, opts('CD'))
-end
-
---
-require("nvim-tree").setup{
-  on_attach = nvim_tree_my_on_attach,
-  diagnostics = {
-    enable = true,
-  }
-}
+-- empty setup using defaults
+require("nvim-tree").setup()
 
 require('Comment').setup()
 
