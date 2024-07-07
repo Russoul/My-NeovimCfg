@@ -1,4 +1,4 @@
--- SUPPORTED NVIM VERSION: 0.9.1
+-- SUPPORTED NVIM VERSION: 0.10.X
 
 
 local g = vim.g
@@ -53,7 +53,7 @@ o.signcolumn = 'auto:3'
 -- Keep undo history after exit
 if vim.fn.has('persistent_undo') == 1 then
   vim.o.undofile = true
-  vim.o.undodir="/Users/russoul/.config/nvim/undo"
+  vim.o.undodir="$HOME/.config/nvim/undo"
 end
 -- ----------------------------
 
