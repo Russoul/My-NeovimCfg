@@ -140,6 +140,9 @@ vim.cmd[[Plug 'shumphrey/fugitive-gitlab.vim']]
 vim.cmd[[Plug 'folke/trouble.nvim', {'commit' : '3f85d8ed30e97ceeddbbcf80224245d347053711'}]]
 -- Show git blame
 vim.cmd[[Plug 'FabijanZulj/blame.nvim', {'commit' : '3e6b2ef4905982cd7d26eb5b18b0e761138eb5ab'}]]
+-- Highlight text via Neovims visual highlighting mechanism
+-- The plugin is buggy. Let's keep it here for now, maybe it will be stabilised in the feature
+vim.cmd[[Plug 'Pocco81/HighStr.nvim']]
 vim.cmd[[call plug#end()]]
 
 -- Highlight on yank (vanity)
@@ -735,3 +738,24 @@ require("trouble").setup{
 }
 
 vim.g.fugitive_gitlab_domains = {["gitlab.onairent.live"]="https://gitlab.onairent.live"}
+
+local high_str = require("high-str")
+
+high_str.setup({
+	verbosity = 0,
+	saving_path = "/tmp/highstr/",
+	highlight_colors = {
+		-- color_id = {"bg_hex_code",<"fg_hex_code"/"smart">}
+		color_0 = {"#0c0d0e", "smart"},	-- Cosmic charcoal
+		color_1 = {"#e5c07b", "smart"},	-- Pastel yellow
+		color_2 = {"#7FFFD4", "smart"},	-- Aqua menthe
+		color_3 = {"#8A2BE2", "smart"},	-- Proton purple
+		color_4 = {"#FF4500", "smart"},	-- Orange red
+		color_5 = {"#008000", "smart"},	-- Office green
+		color_6 = {"#0000FF", "smart"},	-- Just blue
+		color_7 = {"#FFC0CB", "smart"},	-- Blush pink
+		color_8 = {"#FFF9E3", "smart"},	-- Cosmic latte
+		color_9 = {"#7d5c34", "smart"},	-- Fallow brown
+	}
+})
+

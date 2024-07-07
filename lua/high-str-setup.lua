@@ -35,7 +35,7 @@ function hi_underline_sel()
   local line_start = vim.fn.line("'<") - 1
   local line_end = vim.fn.line("'>") - 1
   local col_start = vim.fn.col("'<")
-  local col_end = vim.fn.col("'>") - 1
+  local col_end = vim.fn.col("'>")
   for l=line_start, line_end do
     local added = 0
     for c=col_start, col_end do
