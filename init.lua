@@ -93,9 +93,9 @@ vim.cmd[[Plug 'neovim/nvim-lspconfig', {'commit': 'f43135c38a37c588053ad5e209c74
 -- Used by Telescope
 vim.cmd[[Plug 'nvim-lua/popup.nvim', {'commit': 'b7404d35d5d3548a82149238289fa71f7f6de4ac'}]]
 -- Used by many plugins
-vim.cmd[[Plug 'nvim-lua/plenary.nvim', {'commit': '9069d14a120cadb4f6825f76821533f2babcab92'}]]
+vim.cmd[[Plug 'nvim-lua/plenary.nvim', {'commit': 'a3e3bc82a3f95c5ed0d7201546d5d2c19b20d683'}]]
 -- Handles (multiple) choice generically & comes with a few useful finders
-vim.cmd[[Plug 'nvim-telescope/telescope.nvim', {'commit': '795a63ed293ba249a588e9e67aa1f2cec82028e8'}]]
+vim.cmd[[Plug 'nvim-telescope/telescope.nvim', {'commit': '61a4a615366c470a4e9ca8f8b45718b6b92af73f'}]]
 -- Icons
 vim.cmd[[Plug 'kyazdani42/nvim-web-devicons', {'commit': 'c0cfc1738361b5da1cd0a962dd6f774cc444f856'}]]
 -- Manage git workflow
@@ -123,7 +123,7 @@ vim.cmd[[Plug 'akinsho/toggleterm.nvim', {'commit': '265bbff68fbb8b2a5fb011272ec
 -- Buffers that contain past searches and cmds
 vim.cmd[[Plug 'notomo/cmdbuf.nvim', {'commit': 'e6b37e80cab18368d64184557c3a956cafa4ced7'}]]
 -- Tabs at the top of the screen
-vim.cmd[[Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }]]
+vim.cmd[[Plug 'akinsho/bufferline.nvim', { 'commit': '81820cac7c85e51e4cf179f8a66d13dbf7b032d9' }]]
 -- Preview markdown files
 vim.cmd[[Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }]]
 -- Plugin for telescope that allows one to seach for an emoji
@@ -134,6 +134,8 @@ vim.cmd[[Plug 'simrat39/rust-tools.nvim']]
 vim.cmd[[Plug 'scalameta/nvim-metals']]
 -- Plugin that enables fugitive's GBrowse open links to private repos?
 vim.cmd[[Plug 'https://github.com/tpope/vim-rhubarb']]
+-- Plugin that enables fugitive's GBrowse open links to gitlab repos
+vim.cmd[[Plug 'shumphrey/fugitive-gitlab.vim']]
 -- A buffer for showing diagnostics, references, telescope results, quickfix and location lists
 vim.cmd[[Plug 'folke/trouble.nvim', {'commit' : '3f85d8ed30e97ceeddbbcf80224245d347053711'}]]
 -- Show git blame
@@ -171,6 +173,8 @@ vim.cmd[[hi link idrisLineComment Comment]]
 vim.cmd[[hi link idrisBlockComment Comment]]
 vim.cmd[[hi ColorColumn guibg=#303541]]
 vim.cmd[[hi Search guifg=black guibg=orange4]]
+vim.cmd[[hi @variable ctermfg=59 guifg=#5c6370]]
+vim.cmd[[hi Comment ctermfg=59 guifg=lightgray]]
 
 function StripTrailingWhitespace()
     local l = fn.line(".")
@@ -234,7 +238,7 @@ vim.api.nvim_create_autocmd({"BufNewFile","BufRead", "BufEnter"}, {
     desc = "Assigns a file type to files with .nova extension.",
 })
 
-vim.api.nvim_create_autocmd("BufNewFile,BufRead", {
+vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
     pattern = "*.idr",
     callback = function(args) vim.bo.filetype = "idris2" end,
     desc = "Assigns a file type to files with .idr extension.",
@@ -479,7 +483,6 @@ require("octo-setup")
 require("todo-comments-setup")
 
 -- disable netrw at the very start of your init.lua
-vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 -- set termguicolors to enable highlight groups
@@ -731,4 +734,4 @@ require("trouble").setup{
     use_diagnostic_signs = false -- enabling this will use the signs defined in your lsp client
 }
 
-g.fugitive_gitlab_domains = {'https://gitlab.onairent.live'}
+vim.g.fugitive_gitlab_domains = {["gitlab.onairent.live"]="https://gitlab.onairent.live"}
