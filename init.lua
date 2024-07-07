@@ -7,7 +7,7 @@ local api = vim.api
 local fn = vim.fn
 
 g.mapleader = '|'
-g.main_config_file_dir = "$HOME/.config/nvim"
+g.main_config_file_dir = os.getenv("HOME") .. "/.config/nvim"
 
 vim.cmd[[nnoremap <C-x>cf :e $MYVIMRC<CR>]]
 
@@ -53,7 +53,7 @@ o.signcolumn = 'auto:3'
 -- Keep undo history after exit
 if vim.fn.has('persistent_undo') == 1 then
   vim.o.undofile = true
-  vim.o.undodir="$HOME/.config/nvim/undo"
+  vim.o.undodir = os.getenv("HOME") .. "/.config/nvim/undo"
 end
 -- ----------------------------
 

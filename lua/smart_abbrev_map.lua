@@ -149,6 +149,7 @@ smart_abbrev_map = {
   {"_k"   , "ₖ"},
   {"_s"   , "ₛ"},
   {"_j"   , "ⱼ"},
+  {"^M"   , "ᴹ"},
 
   -- Superscripts
   {"sup=" , "⁼"},
