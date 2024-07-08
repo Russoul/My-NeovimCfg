@@ -47,7 +47,7 @@ o.signcolumn = 'auto:3'
 ----------------- Lazy package manager --------------
 
 -- Bootstrap lazy.nvim
---[[ local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
   local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
@@ -66,102 +66,97 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {
-    {'lervag/vimtex', tag = 'v2.15'}
+    -- Latex plugin
+    {'lervag/vimtex', tag = 'v2.15'},
+    -- A theme
+    {'https://github.com/rakr/vim-one', commit = '187f5c85b682c1933f8780d4d419c55d26a82e24'},
+    -- Draws a box over the outline of the selection
+    {'jbyuki/venn.nvim', commit = '71856b548e3206e33bad10acea294ca8b44327ee'},
+    -- A git plugin
+    {'tpope/vim-fugitive', commit = 'f529acef74b4266d94f22414c60b4a8930c1e0f3'},
+    -- Align lines of code in one command with many options of doing it
+    {'godlygeek/tabular', commit = '339091ac4dd1f17e225fe7d57b48aff55f99b23a'},
+    -- Commenting code
+    {'numToStr/Comment.nvim'},
+    -- Surrounding text with delimiters
+    {'https://tpope.io/vim/surround.git', commit = 'bf3480dc9ae7bea34c78fbba4c65b4548b5b1fea'},
+    -- Repeating complex commands; often plugins require
+    -- this as a dependency in order for the repeat (.) to work properly
+    {'https://tpope.io/vim/repeat.git', commit = '24afe922e6a05891756ecf331f39a1f6743d3d5a'},
+    -- Nice directory tree view
+    {'kyazdani42/nvim-tree.lua', commit = '2086e564c4d23fea714e8a6d63b881e551af2f41'},
+    -- The best theme ever (subjectively of course) !
+    {'https://github.com/joshdick/onedark.vim.git', commit = '7db2ed5b825a311d0f6d12694d4738cf60106dc8'},
+    -- Renders a special line at the bottom of each window that reflects user info
+    {'nvim-lualine/lualine.nvim', commit = '619ededcff79e33a7e0ea677881dd07957449f9d'},
+    -- Motions defined for moving around camel-case words
+    {'https://github.com/bkad/CamelCaseMotion.git', commit = 'de439d7c06cffd0839a29045a103fe4b44b15cdc'},
+    -- Nice when you can't keep up with your cursor movements all around the frame
+    -- (Dims all windows except the one the cursor is currently in)
+    {'https://github.com/blueyed/vim-diminactive.git', commit = '6f2e14e6ff6a038285937c378ec3685e6ff7ee36'},
+    -- LSP configs
+    {'neovim/nvim-lspconfig', commit = 'f43135c38a37c588053ad5e209c7460f43f6340c'},
+    -- Used by Telescope
+    {'nvim-lua/popup.nvim', commit = 'b7404d35d5d3548a82149238289fa71f7f6de4ac'},
+    -- Used by many plugins
+    {'nvim-lua/plenary.nvim', commit = 'a3e3bc82a3f95c5ed0d7201546d5d2c19b20d683'},
+    -- Handles (multiple) choice generically & comes with a few useful finders
+    {'nvim-telescope/telescope.nvim', commit = '61a4a615366c470a4e9ca8f8b45718b6b92af73f'},
+    -- Icons
+    {'kyazdani42/nvim-web-devicons', commit = 'c0cfc1738361b5da1cd0a962dd6f774cc444f856'},
+    -- Manage git workflow
+    {'pwntester/octo.nvim', commit = '4de7b07cb0788d69444d8b08d9936a4b3ffced87'},
+    -- Successor of Signify for Neovim, Lua
+    {'lewis6991/gitsigns.nvim', commit = '0dc886637f9686b7cfd245a4726f93abeab19d4a'},
+    -- Stand-in for VimSneak (works differently)
+    {'ggandor/leap.nvim'},
+    -- Highlights in colour special symbols like:
+    --   * TODO:
+    --   * NOTE:
+    --   * FIX:
+    --   * PERF:
+    --   * HACK:
+    --   * IDEA:
+    --   * REFACTOR:
+    --   and additionally marks lines with signs
+    {'folke/todo-comments.nvim', commit = '98b1ebf198836bdc226c0562b9f906584e6c400e'},
+    -- Idris 2 LSP client
+    {'ShinKage/idris2-nvim', commit = '8bff02984a33264437e70fd9fff4359679d910da'},
+    -- UI component library
+    {'MunifTanjim/nui.nvim', commit = '322978c734866996274467de084a95e4f9b5e0b1'},
+    {'derekelkins/agda-vim'},
+    -- Terminal
+    {'akinsho/toggleterm.nvim', commit = '265bbff68fbb8b2a5fb011272ec469850254ec9f'},
+    -- Buffers that contain past searches and cmds
+    {'notomo/cmdbuf.nvim', commit = 'e6b37e80cab18368d64184557c3a956cafa4ced7'},
+    -- Tabs at the top of the screen
+    {'akinsho/bufferline.nvim', commit = '81820cac7c85e51e4cf179f8a66d13dbf7b032d9'},
+    -- Preview markdown files
+    -- {'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'}
+    -- Plugin for telescope that allows one to seach for an emoji
+    {'xiyaowong/telescope-emoji.nvim', commit = '86248d97be84a1ce83f0541500ef9edc99ea2aa1'},
+    -- Plugin configuration end
+    {'simrat39/rust-tools.nvim'},
+    -- Metals LSP client for scala lang
+    {'scalameta/nvim-metals'},
+    -- Plugin that enables fugitive's GBrowse open links to private repos?
+    {'https://github.com/tpope/vim-rhubarb'},
+    -- Plugin that enables fugitive's GBrowse open links to gitlab repos
+    {'shumphrey/fugitive-gitlab.vim'},
+    -- A buffer for showing diagnostics, references, telescope results, quickfix and location lists
+    {'folke/trouble.nvim', commit = '3f85d8ed30e97ceeddbbcf80224245d347053711'},
+    -- Show git blame
+    {'FabijanZulj/blame.nvim', commit = '3e6b2ef4905982cd7d26eb5b18b0e761138eb5ab'},
+    -- Highlight text via Neovims visual highlighting mechanism
+    -- The plugin is buggy. Let's keep it here for now, maybe it will be stabilised in the feature
+    {'Pocco81/HighStr.nvim'}
   },
   -- Configure any other settings here. See the documentation for more details.
   -- colorscheme that will be used when installing plugins.
   install = { colorscheme = { "habamax" } },
   -- automatically check for plugin updates
-  checker = { enabled = true },
-}) ]]
-
--------------- List of used plugins ---------------
--- TODO: Maybe use packer instead?
-vim.cmd[[call plug#begin()]]
--- Latex plugin
-vim.cmd[[Plug 'lervag/vimtex', { 'tag': 'v2.15' }]]
--- A theme
-vim.cmd[[Plug 'https://github.com/rakr/vim-one', {'commit': '187f5c85b682c1933f8780d4d419c55d26a82e24'}]]
--- Draws a box over the outline of the selection
-vim.cmd[[Plug 'jbyuki/venn.nvim', {'commit': '71856b548e3206e33bad10acea294ca8b44327ee'}]]
--- A git plugin
-vim.cmd[[Plug 'tpope/vim-fugitive', {'commit': 'f529acef74b4266d94f22414c60b4a8930c1e0f3'}]]
--- Align lines of code in one command with many options of doing it
-vim.cmd[[Plug 'godlygeek/tabular', {'commit': '339091ac4dd1f17e225fe7d57b48aff55f99b23a'}]]
--- Commenting code
-vim.cmd[[Plug 'numToStr/Comment.nvim']]
--- Surrounding text with delimiters
-vim.cmd[[Plug 'https://tpope.io/vim/surround.git', {'commit': 'bf3480dc9ae7bea34c78fbba4c65b4548b5b1fea'}]]
--- Repeating complex commands; often plugins require
--- this as a dependency in order for the repeat (.) to work properly
-vim.cmd[[Plug 'https://tpope.io/vim/repeat.git', {'commit': '24afe922e6a05891756ecf331f39a1f6743d3d5a'}]]
--- Nice directory tree view
-vim.cmd[[Plug 'kyazdani42/nvim-tree.lua', {'commit': '2086e564c4d23fea714e8a6d63b881e551af2f41'}]]
--- The best theme ever (subjectively of course) !
-vim.cmd[[Plug 'https://github.com/joshdick/onedark.vim.git', {'commit': '7db2ed5b825a311d0f6d12694d4738cf60106dc8'}]]
--- Renders a special line at the bottom of each window that reflects user info
-vim.cmd[[Plug 'nvim-lualine/lualine.nvim', {'commit': '619ededcff79e33a7e0ea677881dd07957449f9d'}]]
--- Motions defined for moving around camel-case words
-vim.cmd[[Plug 'https://github.com/bkad/CamelCaseMotion.git', {'commit': 'de439d7c06cffd0839a29045a103fe4b44b15cdc'}]]
--- Nice when you can't keep up with your cursor movements all around the frame
--- (Dims all windows except the one the cursor is currently in)
-vim.cmd[[Plug 'https://github.com/blueyed/vim-diminactive.git', {'commit': '6f2e14e6ff6a038285937c378ec3685e6ff7ee36'}]]
--- LSP configs
-vim.cmd[[Plug 'neovim/nvim-lspconfig', {'commit': 'f43135c38a37c588053ad5e209c7460f43f6340c'}]]
--- Used by Telescope
-vim.cmd[[Plug 'nvim-lua/popup.nvim', {'commit': 'b7404d35d5d3548a82149238289fa71f7f6de4ac'}]]
--- Used by many plugins
-vim.cmd[[Plug 'nvim-lua/plenary.nvim', {'commit': 'a3e3bc82a3f95c5ed0d7201546d5d2c19b20d683'}]]
--- Handles (multiple) choice generically & comes with a few useful finders
-vim.cmd[[Plug 'nvim-telescope/telescope.nvim', {'commit': '61a4a615366c470a4e9ca8f8b45718b6b92af73f'}]]
--- Icons
-vim.cmd[[Plug 'kyazdani42/nvim-web-devicons', {'commit': 'c0cfc1738361b5da1cd0a962dd6f774cc444f856'}]]
--- Manage git workflow
-vim.cmd[[Plug 'pwntester/octo.nvim', {'commit': '4de7b07cb0788d69444d8b08d9936a4b3ffced87'}]]
--- Successor of Signify for Neovim, Lua
-vim.cmd[[Plug 'lewis6991/gitsigns.nvim', {'commit': '0dc886637f9686b7cfd245a4726f93abeab19d4a'}]]
--- Stand-in for VimSneak (works differently)
-vim.cmd[[Plug 'ggandor/leap.nvim']]
--- Highlights in colour special symbols like:
---   * TODO:
---   * NOTE:
---   * FIX:
---   * PERF:
---   * HACK:
---   * IDEA:
---   * REFACTOR:
---   and additionally marks lines with signs
-vim.cmd[[Plug 'folke/todo-comments.nvim', {'commit': '98b1ebf198836bdc226c0562b9f906584e6c400e'}]]
-vim.cmd[[Plug 'ShinKage/idris2-nvim', {'commit': '8bff02984a33264437e70fd9fff4359679d910da'}]]
--- UI component library
-vim.cmd[[Plug 'MunifTanjim/nui.nvim', {'commit': '322978c734866996274467de084a95e4f9b5e0b1'}]]
-vim.cmd[[Plug 'derekelkins/agda-vim']]
--- Terminal
-vim.cmd[[Plug 'akinsho/toggleterm.nvim', {'commit': '265bbff68fbb8b2a5fb011272ec469850254ec9f'}]]
--- Buffers that contain past searches and cmds
-vim.cmd[[Plug 'notomo/cmdbuf.nvim', {'commit': 'e6b37e80cab18368d64184557c3a956cafa4ced7'}]]
--- Tabs at the top of the screen
-vim.cmd[[Plug 'akinsho/bufferline.nvim', { 'commit': '81820cac7c85e51e4cf179f8a66d13dbf7b032d9' }]]
--- Preview markdown files
-vim.cmd[[Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }]]
--- Plugin for telescope that allows one to seach for an emoji
-vim.cmd[[Plug 'xiyaowong/telescope-emoji.nvim', {'commit' : '86248d97be84a1ce83f0541500ef9edc99ea2aa1'}]]
--- Plugin configuration end
-vim.cmd[[Plug 'simrat39/rust-tools.nvim']]
--- Metals LSP client for scala lang
-vim.cmd[[Plug 'scalameta/nvim-metals']]
--- Plugin that enables fugitive's GBrowse open links to private repos?
-vim.cmd[[Plug 'https://github.com/tpope/vim-rhubarb']]
--- Plugin that enables fugitive's GBrowse open links to gitlab repos
-vim.cmd[[Plug 'shumphrey/fugitive-gitlab.vim']]
--- A buffer for showing diagnostics, references, telescope results, quickfix and location lists
-vim.cmd[[Plug 'folke/trouble.nvim', {'commit' : '3f85d8ed30e97ceeddbbcf80224245d347053711'}]]
--- Show git blame
-vim.cmd[[Plug 'FabijanZulj/blame.nvim', {'commit' : '3e6b2ef4905982cd7d26eb5b18b0e761138eb5ab'}]]
--- Highlight text via Neovims visual highlighting mechanism
--- The plugin is buggy. Let's keep it here for now, maybe it will be stabilised in the feature
-vim.cmd[[Plug 'Pocco81/HighStr.nvim']]
-vim.cmd[[call plug#end()]]
+  checker = { enabled = false },
+})
 
 ---------- Persistent undo ----------
 if fn.has('persistent_undo') == 1 then
@@ -826,32 +821,12 @@ vim.api.nvim_set_keymap (
 require('Comment').setup()
 
 ------------ LEAP -------------
-require('leap').create_default_mappings()
+---
+vim.keymap.set({'n', 'x', 'o'}, 's',  '<Plug>(leap-forward)')
+vim.keymap.set({'n'}, 'S',  '<Plug>(leap-backward)')
+vim.keymap.set({'n', 'x', 'o'}, 'gs', '<Plug>(leap-from-window)')
 
--- The below settings make Leap's highlighting closer to what you've been
--- used to in Lightspeed.
-
-vim.api.nvim_set_hl(0, 'LeapBackdrop', { link = 'Comment' }) -- or some grey
-vim.api.nvim_set_hl(0, 'LeapMatch', {
-  -- For light themes, set to 'black' or similar.
-  fg = 'white', bold = true, nocombine = true,
-})
-
--- Lightspeed colors
--- primary labels: bg = "#f02077" (light theme) or "#ff2f87"  (dark theme)
--- secondary labels: bg = "#399d9f" (light theme) or "#99ddff" (dark theme)
--- shortcuts: bg = "#f00077", fg = "white"
--- You might want to use either the primary label or the shortcut colors
--- for Leap primary labels, depending on your taste.
-vim.api.nvim_set_hl(0, 'LeapLabelPrimary', {
-  fg = 'red', bold = true, nocombine = true,
-})
-vim.api.nvim_set_hl(0, 'LeapLabelSecondary', {
-  fg = 'blue', bold = true, nocombine = true,
-})
--- Try it without this setting first, you might find you don't even miss it.
--- require('leap').opts.highlight_unlabeled_phase_one_targets = true
-
+require('leap').opts.safe_labels = {}
 -------------- Trouble --------------
 require("trouble").setup{
     position = "bottom", -- position of the list can be: bottom, top, left, right
