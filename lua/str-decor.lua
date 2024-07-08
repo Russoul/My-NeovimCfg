@@ -1,9 +1,11 @@
+local str_decor = {}
 
-cur_hl_group = "NONE"
+str_decor.default_hl_group = "str-decor-hi-group"
+str_decor.namespace        = "str-decor-hi-namespace"
 
-function hi_add(hl_group)
-  local hl_group = hl_group or cur_hl_group
-  local ns = vim.api.nvim_create_namespace("Custom")
+function str_decor.hi(hl_group)
+  hl_group = hl_group or str_decor.default_hl_group
+  local ns = vim.api.nvim_create_namespace(str_decor.namespace)
   local line_start = vim.fn.line(".") - 1
   local col_start_virt = vim.fn.virtcol(".") - 1
   local col_start = vim.fn.byteidx(vim.fn.getline(line_start + 1), col_start_virt)
@@ -12,9 +14,9 @@ function hi_add(hl_group)
   vim.api.nvim_buf_add_highlight(0, ns, hl_group, line_start, col_start, col_end)
 end
 
-function hi_add_sel(hl_group)
-  local hl_group = hl_group or cur_hl_group
-  local ns = vim.api.nvim_create_namespace("Custom")
+function str_decor.hi_sel(hl_group)
+  hl_group = hl_group or str_decor.default_hl_group
+  local ns = vim.api.nvim_create_namespace(str_decor.namespace)
   local line_start = vim.fn.line("'<") - 1
   local line_end = vim.fn.line("'>") - 1
   local col_start = vim.fn.col("'<") - 1
@@ -24,14 +26,14 @@ function hi_add_sel(hl_group)
   end
 end
 
-function hi_rem_sel()
-  local ns = vim.api.nvim_create_namespace("Custom")
+function str_decor.unhi_sel()
+  local ns = vim.api.nvim_create_namespace(str_decor.namespace)
   local lines = vim.fn.getpos("'<")[2]
   local linee = vim.fn.getpos("'>")[2]
   vim.api.nvim_buf_clear_highlight(0, ns, lines - 1, linee)
 end
 
-function hi_underline_sel()
+function str_decor.underline_sel()
   local line_start = vim.fn.line("'<") - 1
   local line_end = vim.fn.line("'>") - 1
   local col_start = vim.fn.col("'<")
@@ -44,3 +46,5 @@ function hi_underline_sel()
     end
   end
 end
+
+return str_decor

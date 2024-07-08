@@ -1,7 +1,5 @@
 " =================   Window manipulation ====================
-" The code below is pretty bad, copied from somewhere.
-" And it really should go into its own file, but let's just leave that for later.
-" At least it has been ironed out.
+" The code below is pretty bad but it works
 function! s:start(mode, oneTime)
 
   let win_mode = a:mode

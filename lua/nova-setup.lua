@@ -10,22 +10,20 @@ if not configs.nova_lsp then
         new_config.capabilities['workspace']['semanticTokens'] = {refreshSupport = true}
       end;
       root_dir = function(fname)
-        return lspconfig.util.find_git_ancestor(fname) or vim.loop.os_homedir()
+        return lspconfig.util.find_git_ancestor(fname)
       end;
       settings = {};
     };
   }
 end
--- Flag to enable semantic highlightning on start, if false you have to issue a first command manually
+-- Flag to enable semantic highlightning on start, if false you have to issue the first command manually
 local autostart_semantic_highlightning = true
 lspconfig.nova_lsp.setup {
-  on_init = custom_init,
   on_attach = function(client)
     if autostart_semantic_highlightning then
       vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
         { textDocument = vim.lsp.util.make_text_document_params() }, nil)
     end
-    --custom_attach(client) -- remove this line if you don't have a customized attach function
   end,
   autostart = true,
   handlers = {
@@ -36,7 +34,7 @@ lspconfig.nova_lsp.setup {
       end
       return vim.NIL
     end,
-    ['textDocument/semanticTokens/full'] = function(err, result, ctx, config)
+    ['textDocument/semanticTokens/full'] = function(err, result, ctx, _)
       if err ~= nil then
           vim.notify(tostring(err), vim.log.levels.ERROR)
           return
@@ -45,6 +43,7 @@ lspconfig.nova_lsp.setup {
       -- temporary handler until native support lands
       local bufnr = ctx.bufnr
       local client = vim.lsp.get_client_by_id(ctx.client_id)
+      if(not client) then print("Nova LSP: Client not initialised yet") return end
       local legend = client.server_capabilities.semanticTokensProvider.legend
       local token_types = legend.tokenTypes
       local data = result.data
@@ -70,6 +69,7 @@ lspconfig.nova_lsp.setup {
           local byte_start = vim.str_byteindex(line, prev_start)
           if prev_start + data[i + 2] >= 0 and prev_start + data[i + 2] <= vim.fn.strchars(line) then
             local byte_end = vim.str_byteindex(line, prev_start + data[i + 2])
+---@diagnostic disable-next-line: param-type-mismatch
             vim.api.nvim_buf_add_highlight(bufnr, ns, 'NOVASemantic_' .. token_type, prev_line, byte_start, byte_end)
           else
             print(line, prev_start, data[i], data[i + 1], data[i + 2], data[i + 3])

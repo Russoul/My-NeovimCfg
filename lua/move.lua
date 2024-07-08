@@ -1,3 +1,4 @@
+local move = {}
 
 -- handles unicode lines
 -- Line number counted from 0
@@ -8,11 +9,8 @@
 -- selIndexEndExc is an index into an existing column in that line
 -- selIndexStartInc < selIndexEndExc
 -- returns a closure that performs the move if possible
-function moveLineSelectionUp(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
+function move.moveLineSelectionUp(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
   local line = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum, lineNum + 1, true))
-  local numChars = vim.fn.strchars(line)
-
-  local numLines = #vim.api.nvim_buf_get_lines(0, 0, -1, true)
 
   if lineNum - 1 < 0 then
     return nil
@@ -23,7 +21,7 @@ function moveLineSelectionUp(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
 
   if selIndexEndExc - 1 >= numCharsprevious then
     vim.api.nvim_buf_set_lines(bufNum, lineNum - 1, lineNum - 1 + 1, true, {previousLine .. " "})
-    return (moveLineSelectionUp(bufNum, lineNum, selIndexStartInc, selIndexEndExc))
+    return (move.moveLineSelectionUp(bufNum, lineNum, selIndexStartInc, selIndexEndExc))
   end
 
   -- 1-indexed
@@ -64,9 +62,8 @@ end
 -- selIndexEndExc is an index into an existing column in that line
 -- selIndexStartInc < selIndexEndExc
 -- returns a closure that performs the move if possible
-function moveLineSelectionDown(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
+function move.moveLineSelectionDown(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
   local line = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum, lineNum + 1, true))
-  local numChars = vim.fn.strchars(line)
 
   local numLines = #vim.api.nvim_buf_get_lines(0, 0, -1, true)
 
@@ -79,7 +76,7 @@ function moveLineSelectionDown(bufNum, lineNum, selIndexStartInc, selIndexEndExc
 
   if selIndexEndExc - 1 >= numCharsNext then
     vim.api.nvim_buf_set_lines(bufNum, lineNum + 1, lineNum + 1 + 1, true, {nextLine .. " "})
-    return (moveLineSelectionDown(bufNum, lineNum, selIndexStartInc, selIndexEndExc))
+    return (move.moveLineSelectionDown(bufNum, lineNum, selIndexStartInc, selIndexEndExc))
   end
 
   -- 1-indexed
@@ -112,7 +109,7 @@ function moveLineSelectionDown(bufNum, lineNum, selIndexStartInc, selIndexEndExc
 
 end
 
-function moveSelectionDown()
+function move.moveSelectionDown()
   local bufnr = vim.fn.getpos("'<")[1]
   local lineLeft1 = vim.fn.line("'<")
   local colLeft1 = vim.fn.charcol("'<")
@@ -128,7 +125,7 @@ function moveSelectionDown()
   local toMove = true
   for linei1 = lineEnd1, lineStart1, -1 do
     local linei0 = linei1 - 1
-    local act = moveLineSelectionDown(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
+    local act = move.moveLineSelectionDown(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
     if act then
       act ()
     else
@@ -146,7 +143,7 @@ function moveSelectionDown()
 
 end
 
-function moveSelectionUp()
+function move.moveSelectionUp()
   local bufnr = vim.fn.getpos("'<")[1]
   local lineLeft1 = vim.fn.line("'<")
   local colLeft1 = vim.fn.charcol("'<")
@@ -162,7 +159,7 @@ function moveSelectionUp()
   local toMove = true
   for linei1 = lineStart1, lineEnd1, 1 do
     local linei0 = linei1 - 1
-    local act = moveLineSelectionUp(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
+    local act = move.moveLineSelectionUp(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
     if act then
       act ()
     else
@@ -189,14 +186,14 @@ end
 -- selIndexEndExc is an index into an existing column in that line
 -- selIndexStartInc < selIndexEndExc
 -- returns a closure that performs the move if possible
-function moveLineSelectionRight(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
+function move.moveLineSelectionRight(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
   local line = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum, lineNum + 1, true))
   local numChars = vim.fn.strchars(line)
   -- print("numChars", numChars)
   -- Nowhere to move: there is no space to the right of the selection
   if selIndexEndExc >= numChars then
     vim.api.nvim_buf_set_lines(bufNum, lineNum, lineNum + 1, true, {line .. " "})
-    return (moveLineSelectionRight(bufNum, lineNum, selIndexStartInc, selIndexEndExc))
+    return (move.moveLineSelectionRight(bufNum, lineNum, selIndexStartInc, selIndexEndExc))
   end
   -- 1-indexed
   local selIndexStartByteInc = 1 + vim.str_byteindex(line, selIndexStartInc)
@@ -228,10 +225,8 @@ end
 -- selIndexEndExc is an index into an existing column in that line
 -- selIndexStartInc < selIndexEndExc
 -- returns a closure that performs the move if possible
-function moveLineSelectionLeft(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
+function move.moveLineSelectionLeft(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
   local line = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum, lineNum + 1, true))
-  local numChars = vim.fn.strchars(line)
-  -- print("numChars", numChars)
   -- Nowhere to move: there is no space to the left of the selection
   if selIndexStartInc == 0 then
     return nil
@@ -268,10 +263,10 @@ end
 --                        //
 --                        //
 
-identity = function () end
+local identity = function () end
 
 -- Creates a function that runs the first function then the second one
-function composition (f, g)
+local function composition (f, g)
   return
     function ()
          f()
@@ -281,7 +276,7 @@ function composition (f, g)
 end
 
 
-function moveSelectionRight()
+function move.moveSelectionRight()
   local bufnr = vim.fn.getpos("'<")[1]
 
   local lineLeft1 = vim.fn.line("'<")
@@ -299,7 +294,7 @@ function moveSelectionRight()
   local computation = identity
   for linei1 = lineStart1, lineEnd1 do
     local linei0 = linei1 - 1
-    local closure = moveLineSelectionRight(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
+    local closure = move.moveLineSelectionRight(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
     -- All sub-lines must be movable in order for the block move to succeed
     if closure then
       computation = composition(computation, closure)
@@ -319,7 +314,7 @@ function moveSelectionRight()
 
 end
 
-function moveSelectionLeft()
+function move.moveSelectionLeft()
   local bufnr = vim.fn.getpos("'<")[1]
   local lineLeft1 = vim.fn.line("'<")
   local colLeft1 = vim.fn.charcol("'<")
@@ -336,7 +331,7 @@ function moveSelectionLeft()
   local computation = identity
   for linei1 = lineStart1, lineEnd1 do
     local linei0 = linei1 - 1
-    local closure = moveLineSelectionLeft(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
+    local closure = move.moveLineSelectionLeft(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
     -- All sub-lines must be movable in order for the block move to succeed
     if closure then
       computation = composition(computation, closure)
@@ -355,3 +350,5 @@ function moveSelectionLeft()
   vim.cmd[[execute "normal! gv"]]
 
 end
+
+return move

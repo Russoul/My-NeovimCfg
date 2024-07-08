@@ -1,4 +1,4 @@
-function unicode_location()
+local function unicode_location()
   return vim.fn.line('.') .. ":" .. vim.fn.virtcol('.') .. "/" .. vim.fn.col('.')
 end
 

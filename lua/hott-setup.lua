@@ -10,7 +10,7 @@ if not configs.hott_lsp then
         new_config.capabilities['workspace']['semanticTokens'] = {refreshSupport = true}
       end;
       root_dir = function(fname)
-        return lspconfig.util.find_git_ancestor(fname) or vim.loop.os_homedir()
+        return lspconfig.util.find_git_ancestor(fname)
       end;
       settings = {};
     };
@@ -19,13 +19,11 @@ end
 -- Flag to enable semantic highlightning on start, if false you have to issue a first command manually
 local autostart_semantic_highlightning = true
 lspconfig.hott_lsp.setup {
-  on_init = custom_init,
   on_attach = function(client)
     if autostart_semantic_highlightning then
       vim.lsp.buf_request(0, 'textDocument/semanticTokens/full',
         { textDocument = vim.lsp.util.make_text_document_params() }, nil)
     end
-    --custom_attach(client) -- remove this line if you don't have a customized attach function
   end,
   autostart = true,
   handlers = {
@@ -45,6 +43,7 @@ lspconfig.hott_lsp.setup {
       -- temporary handler until native support lands
       local bufnr = ctx.bufnr
       local client = vim.lsp.get_client_by_id(ctx.client_id)
+---@diagnostic disable-next-line: need-check-nil
       local legend = client.server_capabilities.semanticTokensProvider.legend
       local token_types = legend.tokenTypes
       local data = result.data
@@ -70,6 +69,7 @@ lspconfig.hott_lsp.setup {
           local byte_start = vim.str_byteindex(line, prev_start)
           if prev_start + data[i + 2] >= 0 and prev_start + data[i + 2] <= vim.fn.strchars(line) then
             local byte_end = vim.str_byteindex(line, prev_start + data[i + 2])
+---@diagnostic disable-next-line: param-type-mismatch
             vim.api.nvim_buf_add_highlight(bufnr, ns, 'HOTTSemantic_' .. token_type, prev_line, byte_start, byte_end)
           else
             print(line, prev_start, data[i], data[i + 1], data[i + 2], data[i + 3])
