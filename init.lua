@@ -105,7 +105,7 @@ require("lazy").setup({
     -- Icons
     {'kyazdani42/nvim-web-devicons', commit = 'c0cfc1738361b5da1cd0a962dd6f774cc444f856'},
     -- Manage git workflow
-    {'pwntester/octo.nvim', commit = '4de7b07cb0788d69444d8b08d9936a4b3ffced87'},
+    {'pwntester/octo.nvim', commit = '44060b7'},
     -- Successor of Signify for Neovim, Lua
     {'lewis6991/gitsigns.nvim', commit = '0dc886637f9686b7cfd245a4726f93abeab19d4a'},
     -- Stand-in for VimSneak (works differently)
@@ -180,7 +180,7 @@ vim.g.fugitive_gitlab_domains = {["gitlab.onairent.live"]="https://gitlab.onaire
 
 ---------- Enable line numbers for particular file types -------------
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = "vim,idris2,python,javascript,lua,c,hott,nova,txt,agda,scala",
+    pattern = "vim,idris2,python,javascript,lua,c,hott,nova,txt,agda,scala,cpp,h",
     callback = function(_)
       vim.o.number = true
     end,
@@ -660,6 +660,10 @@ require("lualine-setup")
 ------------------ Dev Icons -------------------
 require("nvim-web-devicons").setup{default = true}
 
+------------------ Yaml LSP --------------------
+
+require('lspconfig').yamlls.setup {}
+
 ------------------- Telescope ------------------
 local actions = require('telescope.actions')
 
@@ -678,9 +682,9 @@ require('telescope').setup{
 require("telescope").load_extension("emoji")
 
 -- Live grep the workspace
-vim.cmd[[nnoremap <silent> <C-s>L :Telescope live_grep<CR>]]
-vim.cmd[[cnoremap <silent> <C-s>L :Telescope live_grep<CR>]]
-vim.cmd[[tnoremap <silent> <C-s>L <C-\><C-n>:Telescope live_grep<CR>]]
+vim.cmd[[nnoremap <silent> <C-x>ll :Telescope live_grep<CR>]]
+vim.cmd[[cnoremap <silent> <C-x>ll :Telescope live_grep<CR>]]
+vim.cmd[[tnoremap <silent> <C-x>ll <C-\><C-n>:Telescope live_grep<CR>]]
 
 -- List open buffers
 vim.cmd[[noremap <silent> <C-x>b :Telescope buffers<CR>]]
