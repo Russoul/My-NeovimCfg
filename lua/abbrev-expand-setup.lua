@@ -1,9 +1,9 @@
-local smart_abbrev = {}
+local M = {}
 
 -- Assumed to be one-character-long
-smart_abbrev.delim = "\\"
+M.delim = "\\"
 
-smart_abbrev.map = {
+M.map = {
   -- Greek letters
   {"Delta"  , "Δ"},
   {"Gamma"  , "Γ"},
@@ -338,7 +338,10 @@ smart_abbrev.map = {
   {"|_"            , "⌊"},
   {"_|"            , "⌋"},
   {"|^_"           , "⌈"},
-  {"^_|"           , "⌉"}
+  {"^_|"           , "⌉"},
+
+  -- Tmp
+  {"hooray", "🥳"}
 }
 
-return smart_abbrev
+return M

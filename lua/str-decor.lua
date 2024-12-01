@@ -45,6 +45,36 @@ function str_decor.insert_combining(char)
    vim.api.nvim_buf_set_text(0, l, column_byte_offset, l, column_byte_offset, { char })
   end
  end
+ -- Recompute '< and '>
+ local line_start_content = unpack(vim.api.nvim_buf_get_lines(0, line_start, line_start + 1, true))
+ local column_byte_offset = vim.fn.byteidx(line_start_content, col_start)
+ vim.api.nvim_buf_set_mark(0, "<", line_start + 1, column_byte_offset, {})
+ local line_end_content = unpack(vim.api.nvim_buf_get_lines(0, line_start, line_start + 1, true))
+ local column_byte_offset = vim.fn.byteidx(line_end_content, col_end)
+ vim.api.nvim_buf_set_mark(0, ">", line_end + 1, column_byte_offset, {})
+end
+
+-- Currently assumes that all combining symbols are 2 bytes wide
+function str_decor.remove_combining()
+ local line_start = vim.fn.line("'<") - 1
+ local line_end = vim.fn.line("'>") - 1
+ local col_start = vim.fn.charcol("'<") - 1
+ local col_end = vim.fn.charcol("'>") - 1
+ for l = line_start, line_end do
+  for c = col_start, col_end do
+   local line_content = unpack(vim.api.nvim_buf_get_lines(0, l, l + 1, true))
+   local column_byte_offset = vim.fn.byteidx(line_content, c)
+   local column_byte_offset_next = vim.fn.byteidx(line_content, c + 1)
+   vim.api.nvim_buf_set_text(0, l, column_byte_offset_next - 2, l, column_byte_offset_next, {})
+  end
+ end
+ -- Recompute '< and '>
+ local line_start_content = unpack(vim.api.nvim_buf_get_lines(0, line_start, line_start + 1, true))
+ local column_byte_offset = vim.fn.byteidx(line_start_content, col_start)
+ vim.api.nvim_buf_set_mark(0, "<", line_start + 1, column_byte_offset, {})
+ local line_end_content = unpack(vim.api.nvim_buf_get_lines(0, line_start, line_start + 1, true))
+ local column_byte_offset = vim.fn.byteidx(line_end_content, col_end)
+ vim.api.nvim_buf_set_mark(0, ">", line_end + 1, column_byte_offset, {})
 end
 
 function str_decor.underline_sel()

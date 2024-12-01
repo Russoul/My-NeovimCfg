@@ -89,8 +89,6 @@ require("lazy").setup({
     {'https://github.com/joshdick/onedark.vim.git', commit = '7db2ed5b825a311d0f6d12694d4738cf60106dc8'},
     -- Renders a special line at the bottom of each window that reflects user info
     {'nvim-lualine/lualine.nvim', commit = '619ededcff79e33a7e0ea677881dd07957449f9d'},
-    -- Motions defined for moving around camel-case words
-    {'https://github.com/bkad/CamelCaseMotion.git', commit = 'de439d7c06cffd0839a29045a103fe4b44b15cdc'},
     -- Nice when you can't keep up with your cursor movements all around the frame
     -- (Dims all windows except the one the cursor is currently in)
     {'https://github.com/blueyed/vim-diminactive.git', commit = '6f2e14e6ff6a038285937c378ec3685e6ff7ee36'},
@@ -121,7 +119,7 @@ require("lazy").setup({
     --   and additionally marks lines with signs
     {'folke/todo-comments.nvim', commit = '98b1ebf198836bdc226c0562b9f906584e6c400e'},
     -- Idris 2 LSP client
-    {'ShinKage/idris2-nvim', commit = '8bff02984a33264437e70fd9fff4359679d910da'},
+    {dir = '$HOME/my-stuff/projects/idris2-nvim', opts = {}},
     -- UI component library
     {'MunifTanjim/nui.nvim', commit = '322978c734866996274467de084a95e4f9b5e0b1'},
     {'derekelkins/agda-vim'},
@@ -149,7 +147,39 @@ require("lazy").setup({
     {'FabijanZulj/blame.nvim', commit = '3e6b2ef4905982cd7d26eb5b18b0e761138eb5ab'},
     -- Highlight text via Neovims visual highlighting mechanism
     -- The plugin is buggy. Let's keep it here for now, maybe it will be stabilised in the feature
-    {'Pocco81/HighStr.nvim'}
+    {'Pocco81/HighStr.nvim'},
+    -- {"Russoul/abbrev-expand.nvim"}
+    {dir = "$HOME/my-stuff/projects/abbrev-expand.nvim"},
+    -- Helpful for finding out what keys are mapped to interatively
+    {
+      "folke/which-key.nvim",
+      event = "VeryLazy",
+      opts = {},
+      keys = {
+        {
+          "<leader>?",
+          function()
+            require("which-key").show({ global = false })
+          end,
+          desc = "Buffer Local Keymaps (which-key)",
+        },
+      },
+      enabled = false
+    },
+    -- TS LSP
+    {
+      "pmizio/typescript-tools.nvim",
+      dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+      opts = {},
+    },
+    -- Subword textobj and more
+    {
+       "chrisgrieser/nvim-various-textobjs",
+       keys = {},
+    },
+    -- Motions defined for moving around camel-case words
+    { "chrisgrieser/nvim-spider" },
+
   },
   -- Configure any other settings here. See the documentation for more details.
   -- colorscheme that will be used when installing plugins.
@@ -392,11 +422,13 @@ require('gitsigns').setup{
   end
 }
 
----------- Smart abbreviation (custom plugin) ----------
--- TODO make this work in terminals and popup windows, like one found in telescope
-vim.api.nvim_set_keymap('i', '<C-]>', '<Left><C-o>:lua require("smart-abbrev").expand()<CR><Right>',
+---------- abbrev-expand ----------
+-- TODO: make this work in terminals and popup windows, like one found in telescope
+require('abbrev-expand').setup(require('abbrev-expand-setup'))
+
+vim.api.nvim_set_keymap('i', '<C-]>', '<Left><C-o>:lua require("abbrev-expand").expand(".")<CR><Right>',
                         {noremap = true, silent = true})
-vim.api.nvim_set_keymap('x', '<C-]>', '<Left><C-o>:lua require("smart-abbrev").expand()<CR><Right>',
+vim.api.nvim_set_keymap('x', '<C-]>', ':lua require("abbrev-expand").expand("\'>")<CR>',
                         {noremap = true, silent = true})
 
 ------------------- Octo --------------------
@@ -697,15 +729,15 @@ vim.cmd[[cnoremap <silent> <C-x>ff :Telescope fd<CR>]]
 vim.cmd[[tnoremap <silent> <C-x>ff <C-\><C-n>:Telescope fd<CR>]]
 
 -- List files in the folder storing all Idris 2 source files
-vim.cmd[[command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.idris2/idris2-0.7.0"}})]]
+vim.cmd[[command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.pack"}})]]
 vim.cmd[[nnoremap <silent> <C-x>fi :FilesIdr<CR>]]
 vim.cmd[[cnoremap <silent> <C-x>fi :FilesIdr<CR>]]
 vim.cmd[[tnoremap <silent> <C-x>fi <C-\><C-n>:FilesIdr<CR>]]
 
 -- Live grep in the folder storing all Idris2 source files
-vim.cmd[[nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.7.0"}})<CR>]]
-vim.cmd[[cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.7.0"}})<CR>]]
-vim.cmd[[tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.idris2/idris2-0.7.0"}})<CR>]]
+vim.cmd[[nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.pack"}})<CR>]]
+vim.cmd[[cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.pack"}})<CR>]]
+vim.cmd[[tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.pack"}})<CR>]]
 
 -------------- Moving selection around (custom plugin) -------------
 vim.api.nvim_set_keymap('v', '<C-k>', ":lua require('move').moveSelectionDown()<CR>", { noremap = true, silent = true })
@@ -1005,20 +1037,6 @@ rt.setup({
 --------------- JSON LSP ----------------
 require('lspconfig').jsonls.setup{}
 
--------------- Idris 2 LSP --------------
-require('idris2').setup({
-   client = {
-     hover = {
-       use_split = false, -- Persistent split instead of popups for hover
-       with_history = true, -- Show history of hovers instead of only last
-     },
-   },
-   server = {}, -- Options passed to lspconfig idris2 configuration
-   hover_split_position = 'right', -- bottom, top, left or right
-   autostart_semantic = true, -- Should start and refresh semantic highlight automatically
- }
-)
-
 -- Regexp highlighting colours override
 vim.cmd[[hi idrisOperators guifg=#FBAB00]]
 vim.cmd[[hi link idrisStatement Structure]]
@@ -1056,3 +1074,27 @@ vim.api.nvim_create_autocmd({"BufNewFile","BufRead", "BufEnter"}, {
     desc = "Assigns a file type to files with .hott extension.",
 })
 
+----------------- nvim-various-textojbs ----------------
+
+vim.keymap.set({ "o", "x" }, "as", '<cmd>lua require("various-textobjs").subword("outer")<CR>')
+vim.keymap.set({ "o", "x" }, "<space>is", '<cmd>lua require("various-textobjs").subword("inner")<CR>')
+
+---------------- nvim-spider --------------
+vim.keymap.set(
+	{ "n", "o", "x" },
+	"<space>w",
+	"<cmd>lua require('spider').motion('w')<CR>",
+	{ desc = "Spider-w" }
+)
+vim.keymap.set(
+	{ "n", "o", "x" },
+	"<space>e",
+	"<cmd>lua require('spider').motion('e')<CR>",
+	{ desc = "Spider-e" }
+)
+vim.keymap.set(
+	{ "n", "o", "x" },
+	"<space>b",
+	"<cmd>lua require('spider').motion('b')<CR>",
+	{ desc = "Spider-b" }
+)
