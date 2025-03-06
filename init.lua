@@ -74,6 +74,15 @@ require("lazy").setup({
     {'jbyuki/venn.nvim', commit = '71856b548e3206e33bad10acea294ca8b44327ee'},
     -- A git plugin
     {'tpope/vim-fugitive', commit = 'f529acef74b4266d94f22414c60b4a8930c1e0f3'},
+    {
+      "NeogitOrg/neogit",
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        "sindrets/diffview.nvim",
+        "nvim-telescope/telescope.nvim",
+      },
+      config = true
+    },
     -- Align lines of code in one command with many options of doing it
     {'godlygeek/tabular', commit = '339091ac4dd1f17e225fe7d57b48aff55f99b23a'},
     -- Commenting code
@@ -149,7 +158,7 @@ require("lazy").setup({
       keys = {
         {
           "<leader>xx",
-          "<cmd>Trouble diagnostics toggle win = { type = split, position = right, size = 60}<cr>",
+          "<cmd>Trouble diagnostics toggle win = { type = split, position = right, size = 60} focus = true<cr>",
           desc = "Diagnostics (Trouble)",
         },
         {
@@ -184,8 +193,7 @@ require("lazy").setup({
     -- Highlight text via Neovims visual highlighting mechanism
     -- The plugin is buggy. Let's keep it here for now, maybe it will be stabilised in the feature
     {'Pocco81/HighStr.nvim'},
-    -- {"Russoul/abbrev-expand.nvim"}
-    {dir = "$HOME/my-stuff/projects/abbrev-expand.nvim"},
+    {"Russoul/abbrev-expand.nvim"},
     -- Helpful for finding out what keys are mapped to interatively
     {
       "folke/which-key.nvim",
@@ -215,6 +223,22 @@ require("lazy").setup({
     },
     -- Motions defined for moving around camel-case words
     { "chrisgrieser/nvim-spider" },
+    {
+      "yorickpeterse/nvim-window",
+      keys = {
+        { "<leader>wj", "<cmd>lua require('nvim-window').pick()<cr>", desc = "nvim-window: Jump to window" },
+      },
+      config = true,
+    },
+    {
+      "ibhagwan/fzf-lua",
+      -- optional for icon support
+      dependencies = { "nvim-tree/nvim-web-devicons" },
+      config = function()
+        -- calling `setup` is optional for customization
+        require("fzf-lua").setup({})
+      end
+    },
 
   },
   -- Configure any other settings here. See the documentation for more details.
@@ -734,6 +758,7 @@ require('lspconfig').yamlls.setup {}
 
 ------------------- Telescope ------------------
 local actions = require('telescope.actions')
+local actions_layout = require('telescope.actions.layout')
 
 require('telescope').setup{
   defaults = {
@@ -742,6 +767,12 @@ require('telescope').setup{
         ["i"] = actions.move_selection_previous,
         ["k"] = actions.move_selection_next,
         ["x"] = actions.remove_selection,
+        ["<C-p>"] = actions_layout.toggle_preview,
+        ['<C-d>'] = require('telescope.actions').delete_buffer
+      },
+      i = {
+        ["<C-p>"] = actions_layout.toggle_preview,
+        ['<C-d>'] = require('telescope.actions').delete_buffer
       },
     },
   }
@@ -750,19 +781,35 @@ require('telescope').setup{
 require("telescope").load_extension("emoji")
 
 -- Live grep the workspace
-vim.cmd[[nnoremap <silent> <C-x>ll :Telescope live_grep<CR>]]
-vim.cmd[[cnoremap <silent> <C-x>ll :Telescope live_grep<CR>]]
-vim.cmd[[tnoremap <silent> <C-x>ll <C-\><C-n>:Telescope live_grep<CR>]]
+-- vim.cmd[[nnoremap <silent> <C-x>ll :Telescope live_grep<CR>]]
+-- vim.cmd[[cnoremap <silent> <C-x>ll :Telescope live_grep<CR>]]
+-- vim.cmd[[tnoremap <silent> <C-x>ll <C-\><C-n>:Telescope live_grep<CR>]]
+--
+vim.cmd[[nnoremap <silent> <C-x>cc :FzfLua commands<CR>]]
+vim.cmd[[cnoremap <silent> <C-x>cc :FzfLua commands<CR>]]
+vim.cmd[[tnoremap <silent> <C-x>cc <C-\><C-n>:FzfLua commands<CR>]]
+
+vim.cmd[[nnoremap <silent> <C-x>ll :FzfLua live_grep<CR>]]
+vim.cmd[[cnoremap <silent> <C-x>ll :FzfLua live_grep<CR>]]
+vim.cmd[[tnoremap <silent> <C-x>ll <C-\><C-n>:FzfLua live_grep<CR>]]
 
 -- List open buffers
-vim.cmd[[noremap <silent> <C-x>b :Telescope buffers<CR>]]
-vim.cmd[[cnoremap <silent> <C-x>b :Telescope buffers<CR>]]
-vim.cmd[[tnoremap <silent> <C-x>b <C-\><C-n>:Telescope buffers<CR>]]
+-- vim.cmd[[noremap <silent> <C-x>b :lua require("telescope.builtin").buffers({ entry_maker = gen_from_buffer_like_leaderf()})<CR>]]
+-- vim.cmd[[cnoremap <silent> <C-x>b :lua require("telescope.builtin").buffers({ entry_maker = gen_from_buffer_like_leaderf()})<CR>]]
+-- vim.cmd[[tnoremap <silent> <C-x>b <C-\><C-n>:lua require("telescope.builtin").buffers({ entry_maker = gen_from_buffer_like_leaderf()})<CR>]]
+
+vim.cmd[[noremap <silent> <C-x>b :FzfLua buffers<CR>]]
+vim.cmd[[cnoremap <silent> <C-x>b :FzfLua buffers<CR>]]
+vim.cmd[[tnoremap <silent> <C-x>b <C-\><C-n>:FzfLua buffers<CR>]]
 
 -- List files in the workspace.
-vim.cmd[[nnoremap <silent> <C-x>ff :Telescope fd<CR>]]
-vim.cmd[[cnoremap <silent> <C-x>ff :Telescope fd<CR>]]
-vim.cmd[[tnoremap <silent> <C-x>ff <C-\><C-n>:Telescope fd<CR>]]
+-- vim.cmd[[nnoremap <silent> <C-x>ff :Telescope fd<CR>]]
+-- vim.cmd[[cnoremap <silent> <C-x>ff :Telescope fd<CR>]]
+-- vim.cmd[[tnoremap <silent> <C-x>ff <C-\><C-n>:Telescope fd<CR>]]
+
+vim.cmd[[nnoremap <silent> <C-x>ff :FzfLua files<CR>]]
+vim.cmd[[cnoremap <silent> <C-x>ff :FzfLua files<CR>]]
+vim.cmd[[tnoremap <silent> <C-x>ff <C-\><C-n>:FzfLua files<CR>]]
 
 -- List files in the folder storing all Idris 2 source files
 vim.cmd[[command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.pack"}})]]
