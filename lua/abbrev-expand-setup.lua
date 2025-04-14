@@ -306,6 +306,7 @@ M.map = {
   {"right"         , "→"},
   {"pright"        , "⇀"},
   {"dright"        , "⇉"},
+  {"dleft"         , "⇇"},
   {"downright"     , "↳"},
   {"tick"          , "✔"},
   {"cross"         , "✗"},
@@ -322,6 +323,7 @@ M.map = {
   {"box"           , "☐"},
   {"triangle"      , "△"},
   {"diamond"       , "◇"},
+  {"circle"        , "◯"},
   {"lock"          , ""},
   {"unlock"        , ""},
 
