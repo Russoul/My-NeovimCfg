@@ -344,4 +344,9 @@ M.map = {
   {"hooray", "🥳"}
 }
 
+vim.api.nvim_set_keymap('i', '<C-]>', '<Left><C-o>:lua require("abbrev-expand").expand(".")<CR><Right>',
+  { noremap = true, silent = true })
+vim.api.nvim_set_keymap('x', '<C-]>', ':lua require("abbrev-expand").expand("\'>")<CR>',
+  { noremap = true, silent = true })
+
 return M

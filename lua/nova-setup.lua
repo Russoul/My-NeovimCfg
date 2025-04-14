@@ -112,3 +112,10 @@ end
 vim.api.nvim_set_keymap('v', '<C-x><C-e>t', ':lua GetVisuallySelectedText()<CR>',
                         {noremap = true, silent = true})
 
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead", "BufEnter" }, {
+  pattern = { "*.nova" },
+  callback = function(_)
+    vim.bo.filetype = "nova"
+  end,
+  desc = "Assigns a file type to files with .nova extension.",
+})

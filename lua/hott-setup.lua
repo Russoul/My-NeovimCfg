@@ -244,3 +244,11 @@ vim.api.nvim_set_keymap('v', '<C-x><C-e>hi', ':lua HottInfer(GetVisuallySelected
 
 vim.api.nvim_set_keymap('v', '<localleader>i', '<esc>:lua HottInferSelection()<CR>',
                         {noremap = true, silent = true})
+
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead", "BufEnter" }, {
+  pattern = { "*.hott" },
+  callback = function(_)
+    vim.bo.filetype = "hott"
+  end,
+  desc = "Assigns a file type to files with .hott extension.",
+})
