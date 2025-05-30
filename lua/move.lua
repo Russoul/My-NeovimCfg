@@ -1,112 +1,165 @@
 local move = {}
 
--- handles unicode lines
--- Line number counted from 0
--- Unicode character index counted from 0 (note: this is *not* byte index)
--- bufNum is valid buffer number
--- lineNum is existing line number in that buffer
--- selIndexStartInc is an index into an existing column in that line
--- selIndexEndExc is an index into an existing column in that line
--- selIndexStartInc < selIndexEndExc
--- returns a closure that performs the move if possible
-function move.moveLineSelectionUp(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
-  local line = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum, lineNum + 1, true))
+--- A function that does nothing
+local noop = function() end
 
-  if lineNum - 1 < 0 then
-    return nil
-  end
-
-  local previousLine = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum - 1, lineNum - 1 + 1, true))
-  local numCharsprevious = vim.fn.strchars(previousLine)
-
-  if selIndexEndExc - 1 >= numCharsprevious then
-    vim.api.nvim_buf_set_lines(bufNum, lineNum - 1, lineNum - 1 + 1, true, {previousLine .. " "})
-    return (move.moveLineSelectionUp(bufNum, lineNum, selIndexStartInc, selIndexEndExc))
-  end
-
-  -- 1-indexed
-  local selIndexStartByteInc = 1 + vim.str_byteindex(line, selIndexStartInc)
-  -- 1-indexed
-  local selIndexEndByteExc = 1 + vim.str_byteindex(line, selIndexEndExc - 1)
-                               + vim.fn.strlen(vim.fn.strpart(line, selIndexEndExc - 1, 1, true))
-
-  local prefix = string.sub(line, 1, selIndexStartByteInc - 1)
-  local infix = string.sub(line, selIndexStartByteInc, selIndexEndByteExc - 1)
-  local postfix = string.sub(line, selIndexEndByteExc, -1)
-
-  -- 1-indexed
-  local selIndexStartByteInc = 1 + vim.str_byteindex(previousLine, selIndexStartInc)
-  -- 1-indexed
-  local selIndexEndByteExc = 1 + vim.str_byteindex(previousLine, selIndexEndExc - 1)
-                               + vim.fn.strlen(vim.fn.strpart(previousLine, selIndexEndExc - 1, 1, true))
-
-  local prefixprevious = string.sub(previousLine, 1, selIndexStartByteInc - 1)
-  local infixprevious = string.sub(previousLine, selIndexStartByteInc, selIndexEndByteExc - 1)
-  local postfixprevious = string.sub(previousLine, selIndexEndByteExc, -1)
-
-  local result = prefix .. infixprevious .. postfix
-  local resultprevious = prefixprevious .. infix .. postfixprevious
-  return function ()
-    vim.api.nvim_buf_set_lines(bufNum, lineNum, lineNum + 1, true, {result})
-    vim.api.nvim_buf_set_lines(bufNum, lineNum - 1, lineNum - 1 + 1, true, {resultprevious})
-  end
-
+--- Creates a function that runs the first function then the second one
+--- @param f function
+--- @param g function
+--- @return function
+local function composition(f, g)
+  return
+      function()
+        f()
+        g()
+      end
 end
 
--- handles unicode lines
--- Line number counted from 0
--- Unicode character index counted from 0 (note: this is *not* byte index)
--- bufNum is valid buffer number
--- lineNum is existing line number in that buffer
--- selIndexStartInc is an index into an existing column in that line
--- selIndexEndExc is an index into an existing column in that line
--- selIndexStartInc < selIndexEndExc
--- returns a closure that performs the move if possible
-function move.moveLineSelectionDown(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
-  local line = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum, lineNum + 1, true))
+--- Pad the 0-indeded line at {linenum} in buffer {bufnum} with space on the right
+--- until the line has a character at 0-indexed visual character column {atleastcol}.
+--- @param bufnum number
+--- @param linenum number
+--- @param atleastcol number
+function move.pad(bufnum, linenum, atleastcol)
+  local line = unpack(vim.api.nvim_buf_get_lines(bufnum, linenum, linenum + 1, true))
 
-  local numLines = #vim.api.nvim_buf_get_lines(0, 0, -1, true)
+  local numchars = vim.fn.strchars(line, true)
 
-  if lineNum + 1 >= numLines then
+  if atleastcol - 1 >= numchars then
+    vim.api.nvim_buf_set_lines(bufnum, linenum, linenum + 1, true, { line .. " " })
+    move.pad(bufnum, linenum, atleastcol)
+  end
+end
+
+--- Split the line at {linenum} in buffer {bufnum} into 3 subparts by 0-indexed visual character columns {startinc} and {endexc}
+--- @param bufnum number
+--- @param linenum number
+--- @param startinc number
+--- @param endexc number
+--- @return string, string, string
+function move.splitAt(bufnum, linenum, startinc, endexc)
+  local line = unpack(vim.api.nvim_buf_get_lines(bufnum, linenum, linenum + 1, true))
+
+  -- 1-indexed
+  local startincbyte = 1 + vim.fn.strlen(vim.fn.strcharpart(line, 0, startinc, true))
+  -- 1-indexed
+  local endexcbyte = 1 + vim.fn.strlen(vim.fn.strcharpart(line, 0, endexc, true))
+
+  local prefix = string.sub(line, 1, startincbyte - 1)
+  local infix = string.sub(line, startincbyte, endexcbyte - 1)
+  local postfix = string.sub(line, endexcbyte)
+
+  return prefix, infix, postfix
+end
+
+--- If possible, exchanges the selection spanned by 0-indexed visual character columns {startinc} and {endexc}
+--- at 0-indexed line {linenum} in buffer {bufnum} with the corresponding characters in the previous line in the same buffer.
+--- If there aren't enough characters in the previous line, pads that line with space on the right until it has just enough space for a swap.
+--- Returns nil if there is nowhere to move the selection. Returns a nullary function that performs the exchange otherwise.
+--- @param bufnum number
+--- @param linenum number
+--- @param startinc number
+--- @param endexc number
+--- @return nil|function
+function move.moveLineSelectionUp(bufnum, linenum, startinc, endexc)
+  if linenum - 1 < 0 then
     return nil
   end
 
-  local nextLine = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum + 1, lineNum + 1 + 1, true))
-  local numCharsNext = vim.fn.strchars(nextLine)
+  move.pad(bufnum, linenum - 1, endexc)
 
-  if selIndexEndExc - 1 >= numCharsNext then
-    vim.api.nvim_buf_set_lines(bufNum, lineNum + 1, lineNum + 1 + 1, true, {nextLine .. " "})
-    return (move.moveLineSelectionDown(bufNum, lineNum, selIndexStartInc, selIndexEndExc))
+  local prefix, infix, postfix = move.splitAt(bufnum, linenum, startinc, endexc)
+
+  local prefixprevious, infixprevious, postfixprevious = move.splitAt(bufnum, linenum - 1, startinc,
+    endexc)
+
+  local newline = prefix .. infixprevious .. postfix
+  local newlineprevious = prefixprevious .. infix .. postfixprevious
+
+  return function()
+    vim.api.nvim_buf_set_lines(bufnum, linenum, linenum + 1, true, { newline })
+    vim.api.nvim_buf_set_lines(bufnum, linenum - 1, linenum - 1 + 1, true, { newlineprevious })
+  end
+end
+
+--- Exchanges the selection spanned by 0-indexed visual character columns {startinc} and {endexc}
+--- at 0-indexed line {linenum} in buffer {bufnum} with the corresponding characters in the next line in the same buffer.
+--- If there aren't enough characters in the next line, pads that line with space on the right until it has just enough space for a swap.
+--- If there is no line below, adds an empty one and pads it with space just enough.
+--- Returns a nullary function that performs the exchange.
+--- @param bufnum number
+--- @param linenum number
+--- @param startinc number
+--- @param endexc number
+--- @return function
+function move.moveLineSelectionDown(bufnum, linenum, startinc, endexc)
+  local numLines = #vim.api.nvim_buf_get_lines(bufnum, 0, -1, true)
+
+  if linenum + 1 >= numLines then
+    vim.api.nvim_buf_set_lines(bufnum, linenum + 1, linenum + 1, true, { "" })
+    return move.moveLineSelectionDown(bufnum, linenum, startinc, endexc)
   end
 
-  -- 1-indexed
-  local selIndexStartByteInc = 1 + vim.str_byteindex(line, selIndexStartInc)
-  -- 1-indexed
-  local selIndexEndByteExc = 1 + vim.str_byteindex(line, selIndexEndExc - 1)
-                               + vim.fn.strlen(vim.fn.strpart(line, selIndexEndExc - 1, 1, true))
+  move.pad(bufnum, linenum + 1, endexc)
 
+  local prefix, infix, postfix = move.splitAt(bufnum, linenum, startinc, endexc)
 
-  local prefix = string.sub(line, 1, selIndexStartByteInc - 1)
-  local infix = string.sub(line, selIndexStartByteInc, selIndexEndByteExc - 1)
-  local postfix = string.sub(line, selIndexEndByteExc, -1)
+  local prefixnext, infixnext, postfixnext = move.splitAt(bufnum, linenum + 1, startinc, endexc)
 
-  -- 1-indexed
-  local selIndexStartByteInc = 1 + vim.str_byteindex(nextLine, selIndexStartInc)
-  -- 1-indexed
-  local selIndexEndByteExc = 1 + vim.str_byteindex(nextLine, selIndexEndExc - 1)
-                               + vim.fn.strlen(vim.fn.strpart(nextLine, selIndexEndExc - 1, 1, true))
+  local newline = prefix .. infixnext .. postfix
+  local newlinenext = prefixnext .. infix .. postfixnext
 
-  local prefixNext = string.sub(nextLine, 1, selIndexStartByteInc - 1)
-  local infixNext = string.sub(nextLine, selIndexStartByteInc, selIndexEndByteExc - 1)
-  local postfixNext = string.sub(nextLine, selIndexEndByteExc, -1)
+  return function()
+    vim.api.nvim_buf_set_lines(bufnum, linenum, linenum + 1, true, { newline })
+    vim.api.nvim_buf_set_lines(bufnum, linenum + 1, linenum + 1 + 1, true, { newlinenext })
+  end
+end
 
-  local result = prefix .. infixNext .. postfix
-  local resultNext = prefixNext .. infix .. postfixNext
-  return function ()
-    vim.api.nvim_buf_set_lines(bufNum, lineNum, lineNum + 1, true, {result})
-    vim.api.nvim_buf_set_lines(bufNum, lineNum + 1, lineNum + 1 + 1, true, {resultNext})
+--- Exchanges the selection spanned by 0-indexed visual character columns {startinc} and {endexc}
+--- at 0-indexed line {linenum} in buffer {bufnum} with the character immediately next to it on the right.
+--- If there are no more characters on the right, insert one space.
+--- Returns a nullary function that performs the exchange.
+--- @param bufnum number
+--- @param linenum number
+--- @param startinc number
+--- @param endexc number
+--- @return function
+function move.moveLineSelectionRight(bufnum, linenum, startinc, endexc)
+  move.pad(bufnum, linenum, endexc + 1)
+
+  local prefix, infix1, _ = move.splitAt(bufnum, linenum, startinc, endexc)
+
+  local _, infix2, postfix = move.splitAt(bufnum, linenum, endexc, endexc + 1)
+
+  return function()
+    vim.api.nvim_buf_set_lines(bufnum, linenum, linenum + 1, true,
+      { prefix .. infix2 .. infix1 .. postfix })
+  end
+end
+
+--- If possible, exchanges the selection spanned by 0-indexed visual character columns {startinc} and {endexc}
+--- at 0-indexed line {linenum} in buffer {bufnum} with the character immediately next to it on the left.
+--- If there is no character preceding the selection, returns nil.
+--- Returns a nullary function that performs the exchange otherwise.
+--- @param bufnum number
+--- @param linenum number
+--- @param startinc number
+--- @param endexc number
+--- @return nil|function
+function move.moveLineSelectionLeft(bufnum, linenum, startinc, endexc)
+  -- Nowhere to move: there is no space to the left of the selection
+  if startinc == 0 then
+    return nil
   end
 
+  local _, infix2, postfix = move.splitAt(bufnum, linenum, startinc, endexc)
+
+  local prefix, infix1, _ = move.splitAt(bufnum, linenum, startinc - 1, startinc)
+
+  return function()
+    vim.api.nvim_buf_set_lines(bufnum, linenum, linenum + 1, true,
+      { prefix .. infix2 .. infix1 .. postfix })
+  end
 end
 
 function move.moveSelectionDown()
@@ -120,14 +173,13 @@ function move.moveSelectionDown()
   local colStart1 = math.min(colLeft1, colRight1)
   local colEnd1 = math.max(colLeft1, colRight1)
   local lineEnd1 = math.max(lineLeft1, lineRight1)
-  print(colStart1, colEnd1)
 
   local toMove = true
   for linei1 = lineEnd1, lineStart1, -1 do
     local linei0 = linei1 - 1
     local act = move.moveLineSelectionDown(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
     if act then
-      act ()
+      act()
     else
       toMove = false
       break
@@ -135,12 +187,11 @@ function move.moveSelectionDown()
   end
 
   if toMove then
-    vim.fn.setcharpos("'<", {bufnr, lineStart1 + 1, colStart1, 0})
-    vim.fn.setcharpos("'>", {bufnr, lineEnd1 + 1, colEnd1, 0})
+    vim.fn.setcharpos("'<", { bufnr, lineStart1 + 1, colStart1, 0 })
+    vim.fn.setcharpos("'>", { bufnr, lineEnd1 + 1, colEnd1, 0 })
   end
 
-  vim.cmd[[execute "normal! gv"]]
-
+  vim.cmd [[execute "normal! gv"]]
 end
 
 function move.moveSelectionUp()
@@ -154,14 +205,13 @@ function move.moveSelectionUp()
   local colStart1 = math.min(colLeft1, colRight1)
   local colEnd1 = math.max(colLeft1, colRight1)
   local lineEnd1 = math.max(lineLeft1, lineRight1)
-  print(colStart1, colEnd1)
 
   local toMove = true
   for linei1 = lineStart1, lineEnd1, 1 do
     local linei0 = linei1 - 1
     local act = move.moveLineSelectionUp(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
     if act then
-      act ()
+      act()
     else
       toMove = false
       break
@@ -169,112 +219,12 @@ function move.moveSelectionUp()
   end
 
   if toMove then
-    vim.fn.setcharpos("'<", {bufnr, lineStart1 - 1, colStart1, 0})
-    vim.fn.setcharpos("'>", {bufnr, lineEnd1 - 1, colEnd1, 0})
+    vim.fn.setcharpos("'<", { bufnr, lineStart1 - 1, colStart1, 0 })
+    vim.fn.setcharpos("'>", { bufnr, lineEnd1 - 1, colEnd1, 0 })
   end
 
-  vim.cmd[[execute "normal! gv"]]
-
+  vim.cmd [[execute "normal! gv"]]
 end
-
--- handles unicode lines
--- Line number counted from 0
--- Unicode character index counted from 0 (note: this is *not* byte index)
--- bufNum is valid buffer number
--- lineNum is existing line number in that buffer
--- selIndexStartInc is an index into an existing column in that line
--- selIndexEndExc is an index into an existing column in that line
--- selIndexStartInc < selIndexEndExc
--- returns a closure that performs the move if possible
-function move.moveLineSelectionRight(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
-  local line = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum, lineNum + 1, true))
-  local numChars = vim.fn.strchars(line)
-  -- print("numChars", numChars)
-  -- Nowhere to move: there is no space to the right of the selection
-  if selIndexEndExc >= numChars then
-    vim.api.nvim_buf_set_lines(bufNum, lineNum, lineNum + 1, true, {line .. " "})
-    return (move.moveLineSelectionRight(bufNum, lineNum, selIndexStartInc, selIndexEndExc))
-  end
-  -- 1-indexed
-  local selIndexStartByteInc = 1 + vim.str_byteindex(line, selIndexStartInc)
-  -- 1-indexed
-  local selIndexEndByteExc = 1 + vim.str_byteindex(line, selIndexEndExc)
-
-  local prefix = string.sub(line, 1, selIndexStartByteInc - 1)
-
-  -- Contains at least one character
-  local postfix = string.sub(line, selIndexEndByteExc, -1)
-  local firstCharOfPostfix = string.sub(postfix, 1, vim.fn.strlen(vim.fn.strpart(postfix, 0, 1, true)))
-  local newPrefix = prefix .. firstCharOfPostfix
-  local infix = string.sub(line, selIndexStartByteInc, selIndexEndByteExc - 1)
-  local newPostfix = string.sub(postfix, 1 + vim.fn.strlen(firstCharOfPostfix), -1)
-  local result = newPrefix .. infix .. newPostfix
-  --[[ print("prefix", prefix)
-  print("infix", infix)
-  print("postfix", postfix) ]]
-
-  return function () vim.api.nvim_buf_set_lines(bufNum, lineNum, lineNum + 1, true, {result}) end
-end
-
--- handles unicode lines
--- Line number counted from 0
--- Unicode character index counted from 0 (note: this is *not* byte index)
--- bufNum is valid buffer number
--- lineNum is existing line number in that buffer
--- selIndexStartInc is an index into an existing column in that line
--- selIndexEndExc is an index into an existing column in that line
--- selIndexStartInc < selIndexEndExc
--- returns a closure that performs the move if possible
-function move.moveLineSelectionLeft(bufNum, lineNum, selIndexStartInc, selIndexEndExc)
-  local line = unpack(vim.api.nvim_buf_get_lines(bufNum, lineNum, lineNum + 1, true))
-  -- Nowhere to move: there is no space to the left of the selection
-  if selIndexStartInc == 0 then
-    return nil
-  end
-  -- 1-indexed
-  local selIndexStartByteInc = 1 + vim.str_byteindex(line, selIndexStartInc)
-  -- 1-indexed
-  local selIndexEndByteExc = 1 + vim.str_byteindex(line, selIndexEndExc)
-
-  -- Contains at least one character
-  local prefix = string.sub(line, 1, selIndexStartByteInc - 1)
-  local prefixLen = vim.fn.strchars(prefix)
-  local prefixAllButLastCharByteLen = vim.fn.strlen(vim.fn.strpart(prefix, 0, prefixLen - 1, true))
-
-  local postfix = string.sub(line, selIndexEndByteExc, -1)
-  local lastCharOfPrefix = string.sub(prefix, 1 + prefixAllButLastCharByteLen, -1)
-  local newPrefix = string.sub(prefix, 1, prefixAllButLastCharByteLen)
-  local infix = string.sub(line, selIndexStartByteInc, selIndexEndByteExc - 1)
-  local newPostfix = lastCharOfPrefix .. postfix
-  local result = newPrefix .. infix .. newPostfix
-  --[[ print("prefix", prefix)
-  print("infix", infix)
-  print("postfix", postfix) ]]
-
-  return function () vim.api.nvim_buf_set_lines(bufNum, lineNum, lineNum + 1, true, {result}) end
-end
-
---                        //
---       λy. f y          //
---       λx. f x          //
---     ┌───────────┐      //
---     │Hello world│      //
---     └───────────┘      //
---                        //
---                        //
-
-local identity = function () end
-
--- Creates a function that runs the first function then the second one
-local function composition (f, g)
-  return
-    function ()
-         f()
-         g()
-    end
-
-end
-
 
 function move.moveSelectionRight()
   local bufnr = vim.fn.getpos("'<")[1]
@@ -288,10 +238,9 @@ function move.moveSelectionRight()
   local colStart1 = math.min(colLeft1, colRight1)
   local colEnd1 = math.max(colLeft1, colRight1)
   local lineEnd1 = math.max(lineLeft1, lineRight1)
-  print(colStart1, colEnd1)
 
   local toMove = true
-  local computation = identity
+  local computation = noop
   for linei1 = lineStart1, lineEnd1 do
     local linei0 = linei1 - 1
     local closure = move.moveLineSelectionRight(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
@@ -306,12 +255,11 @@ function move.moveSelectionRight()
 
   if toMove then
     computation()
-    vim.fn.setcharpos("'<", {bufnr, lineStart1, colStart1 + 1, 0})
-    vim.fn.setcharpos("'>", {bufnr, lineEnd1, colEnd1 + 1, 0})
+    vim.fn.setcharpos("'<", { bufnr, lineStart1, colStart1 + 1, 0 })
+    vim.fn.setcharpos("'>", { bufnr, lineEnd1, colEnd1 + 1, 0 })
   end
 
-  vim.cmd[[execute "normal! gv"]]
-
+  vim.cmd [[execute "normal! gv"]]
 end
 
 function move.moveSelectionLeft()
@@ -325,10 +273,9 @@ function move.moveSelectionLeft()
   local colStart1 = math.min(colLeft1, colRight1)
   local colEnd1 = math.max(colLeft1, colRight1)
   local lineEnd1 = math.max(lineLeft1, lineRight1)
-  print(colStart1, colEnd1)
 
   local toMove = true
-  local computation = identity
+  local computation = noop
   for linei1 = lineStart1, lineEnd1 do
     local linei0 = linei1 - 1
     local closure = move.moveLineSelectionLeft(bufnr, linei0, colStart1 - 1, colEnd1 - 1 + 1)
@@ -343,12 +290,21 @@ function move.moveSelectionLeft()
 
   if toMove then
     computation()
-    vim.fn.setcharpos("'<", {bufnr, lineStart1, colStart1 - 1, 0})
-    vim.fn.setcharpos("'>", {bufnr, lineEnd1, colEnd1 - 1, 0})
+    vim.fn.setcharpos("'<", { bufnr, lineStart1, colStart1 - 1, 0 })
+    vim.fn.setcharpos("'>", { bufnr, lineEnd1, colEnd1 - 1, 0 })
   end
 
-  vim.cmd[[execute "normal! gv"]]
-
+  vim.cmd [[execute "normal! gv"]]
 end
 
 return move
+
+--                        //
+--     λy. f y            //
+--     λx. f x            //
+--        x̄               //
+--    ┌───────────┐       //
+--    │Hello world│       //
+--    └───────────┘       //
+--        ȳ               //
+--                        //
