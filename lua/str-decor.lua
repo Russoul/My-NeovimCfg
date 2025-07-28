@@ -81,6 +81,10 @@ function str_decor.underline_sel()
   str_decor.insert_combining("̲")
 end
 
+function str_decor.double_underline_sel()
+  str_decor.insert_combining("̳")
+end
+
 function str_decor.overline_sel()
   str_decor.insert_combining("̅")
 end

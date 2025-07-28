@@ -183,7 +183,13 @@ require("lazy").setup({
     { 'hrsh7th/cmp-buffer' },
     { 'hrsh7th/cmp-path' },
     { 'hrsh7th/cmp-cmdline' },
-    { 'hrsh7th/nvim-cmp' }
+    { 'hrsh7th/nvim-cmp' },
+    {
+      'mrcjkb/haskell-tools.nvim',
+      version = '^6', -- Recommended
+      lazy = false, -- This plugin is already lazy
+    }
+
 
   },
   -- Configure any other settings here. See the documentation for more details.
@@ -517,3 +523,9 @@ require('spider-setup')
 
 ----------------- nvim-cmp --------------
 require('cmp-setup')
+
+----------------- Haskell-tools ----------------
+require('haskell-tools-setup')
+
+----------------- venn-setup ----------------
+require('venn-setup')
