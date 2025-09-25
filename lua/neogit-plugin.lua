@@ -1,5 +1,6 @@
 return {
   "NeogitOrg/neogit",
+  commit = "df08cb9",
   dependencies = {
     "nvim-lua/plenary.nvim",
     "sindrets/diffview.nvim",
