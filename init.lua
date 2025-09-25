@@ -44,6 +44,14 @@ o.inccommand = 'nosplit'
 -- Allow up to 3 signs to be rendered simultaneously
 o.signcolumn = 'auto:3'
 
+if vim.g.neovide then
+  vim.keymap.set({'i', 'c'}, '<D-v>', '<C-r>+')
+  vim.keymap.set({'t'}, '<D-v>', '<C-\\><C-n>"+pa')
+  vim.keymap.set('n', '<D-v>', '"+p')
+  vim.g.neovide_no_idle = false
+  vim.g.neovide_refresh_rate_idle = 0
+end
+
 ----------------- Lazy package manager --------------
 
 -- Bootstrap lazy.nvim
@@ -74,6 +82,12 @@ require("lazy").setup({
     { 'jbyuki/venn.nvim',                commit = '71856b548e3206e33bad10acea294ca8b44327ee' },
     -- A git plugin
     { 'tpope/vim-fugitive',              commit = 'f529acef74b4266d94f22414c60b4a8930c1e0f3' },
+    {'sindrets/diffview.nvim',
+       commit = "4516612fe98ff56ae0415a259ff6361a89419b0a",
+       config = function ()
+         require('diffview-setup')
+       end
+    },
     -- A UI for git
     require('neogit-plugin'),
     -- Align lines of code in one command with many options of doing it
@@ -491,6 +505,18 @@ vim.api.nvim_set_keymap('n', '<LocalLeader>r', ':lua vim.lsp.buf.references()<CR
 vim.api.nvim_set_keymap('n', ']d', ':lua vim.diagnostic.goto_next()<CR>',
   { noremap = true, silent = false })
 vim.api.nvim_set_keymap('n', '[d', ':lua vim.diagnostic.goto_prev()<CR>',
+  { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', ']e', ':lua vim.diagnostic.goto_next({severity = vim.diagnostic.severity.ERROR})<CR>',
+  { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', '[e', ':lua vim.diagnostic.goto_prev({severity = vim.diagnostic.severity.ERROR})<CR>',
+  { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', ']w', ':lua vim.diagnostic.goto_next({severity = vim.diagnostic.severity.WARN})<CR>',
+  { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', '[w', ':lua vim.diagnostic.goto_prev({severity = vim.diagnostic.severity.WARN})<CR>',
+  { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', ']i', ':lua vim.diagnostic.goto_next({severity = vim.diagnostic.severity.INFO})<CR>',
+  { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', '[i', ':lua vim.diagnostic.goto_prev({severity = vim.diagnostic.severity.INFO})<CR>',
   { noremap = true, silent = false })
 
 
