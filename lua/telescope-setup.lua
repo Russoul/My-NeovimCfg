@@ -37,13 +37,13 @@ require("telescope").load_extension("emoji")
 
 
 -- List files in the folder storing all Idris 2 source files
-vim.cmd [[command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"~/.pack"}})]]
+vim.cmd [[command! FilesIdr :lua require("telescope.builtin").fd({search_dirs={"/Users/russoul/.local/state/pack/install/0e9b01d0400593fa99b320c56f6e77406a4eb968"}})]]
 vim.cmd [[nnoremap <silent> <C-x>fi :FilesIdr<CR>]]
 vim.cmd [[cnoremap <silent> <C-x>fi :FilesIdr<CR>]]
 vim.cmd [[tnoremap <silent> <C-x>fi <C-\><C-n>:FilesIdr<CR>]]
 
 -- Live grep in the folder storing all Idris2 source files
-vim.cmd [[nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.pack"}})<CR>]]
-vim.cmd [[cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"~/.pack"}})<CR>]]
-vim.cmd [[tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"~/.pack"}})<CR>]]
+vim.cmd [[nnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"/Users/russoul/.local/state/pack/install/0e9b01d0400593fa99b320c56f6e77406a4eb968"}})<CR>]]
+vim.cmd [[cnoremap <silent> <C-x>li :lua require("telescope.builtin").live_grep({search_dirs={"/Users/russoul/.local/state/pack/install/0e9b01d0400593fa99b320c56f6e77406a4eb968"}})<CR>]]
+vim.cmd [[tnoremap <silent> <C-x>li <C-\><C-n>:lua require("telescope.builtin").live_grep({search_dirs={"/Users/russoul/.local/state/pack/install/0e9b01d0400593fa99b320c56f6e77406a4eb968"}})<CR>]]
 

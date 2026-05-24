@@ -47,10 +47,14 @@ o.signcolumn = 'auto:3'
 if vim.g.neovide then
   vim.keymap.set({'i', 'c'}, '<D-v>', '<C-r>+')
   vim.keymap.set({'t'}, '<D-v>', '<C-\\><C-n>"+pa')
-  vim.keymap.set('n', '<D-v>', '"+p')
+  vim.keymap.set({'n', 'v'}, '<D-v>', '"+p')
   vim.g.neovide_no_idle = false
   vim.g.neovide_refresh_rate_idle = 0
 end
+
+-- Ignore left and right mouse/trackpad movements
+vim.keymap.set('', '<ScrollWheelLeft>', '<Nop>', { silent = true })
+vim.keymap.set('', '<ScrollWheelRight>', '<Nop>', { silent = true })
 
 ----------------- Lazy package manager --------------
 
@@ -119,11 +123,58 @@ require("lazy").setup({
     -- Icons
     { 'kyazdani42/nvim-web-devicons',                   commit = 'c0cfc1738361b5da1cd0a962dd6f774cc444f856' },
     -- Manage git workflow
-    { 'pwntester/octo.nvim',                            commit = '44060b7' },
+    { 'pwntester/octo.nvim',                            commit = 'b51e528' },
     -- Successor of Signify for Neovim, Lua
     { 'lewis6991/gitsigns.nvim',                        commit = '0dc886637f9686b7cfd245a4726f93abeab19d4a' },
     -- Stand-in for VimSneak (works differently)
-    { 'ggandor/leap.nvim' },
+    { url = "https://codeberg.org/andyg/leap.nvim" },
+    -- curl plugin
+    {
+      "oysandvik94/curl.nvim",
+      cmd = { "CurlOpen" },
+      dependencies = {
+      "nvim-lua/plenary.nvim",
+      },
+      config = true,
+    },
+    {
+      'nvim-treesitter/nvim-treesitter',
+      lazy = false,
+      build = ':TSUpdate'
+    },
+    {
+      "rest-nvim/rest.nvim",
+      ft = "http",
+      build = false,
+      dependencies = {
+        "j-hui/fidget.nvim",
+        "nvim-neotest/nvim-nio",
+        "nvim-treesitter/nvim-treesitter",
+        {
+          -- Lazy.nvim does not recognize this library's rocksfile, so add it
+          -- to package path manually.
+          "manoelcampos/xml2lua",
+          config = function(plugin)
+            package.path = package.path .. ";" .. plugin.dir .. "/?.lua"
+          end,
+        },
+        "lunarmodules/lua-mimetypes"
+      },
+    },
+    -- {
+    --    "mistweaverco/kulala.nvim",
+    --    keys = {
+    --      { "<leader>Rs", desc = "Send request" },
+    --      { "<leader>Ra", desc = "Send all requests" },
+    --      { "<leader>Rb", desc = "Open scratchpad" },
+    --    },
+    --    ft = {"http", "rest"},
+    --    opts = {
+    --      global_keymaps = true,
+    --      global_keymaps_prefix = "<leader>R",
+    --      kulala_keymaps_prefix = "",
+    --    },
+    --  },
     -- Highlights in colour special symbols like:
     --   * TODO:
     --   * NOTE:
@@ -169,7 +220,9 @@ require("lazy").setup({
     -- Highlight text via Neovims visual highlighting mechanism
     -- The plugin is buggy. Let's keep it here for now, maybe it will be stabilised in the feature
     { 'Pocco81/HighStr.nvim' },
-    { "Russoul/abbrev-expand.nvim" },
+    { "Russoul/abbrev-expand.nvim", lazy = false },
+    { "Russoul/window-manip.nvim", lazy = false },
+    { "Russoul/block-move.nvim",   lazy = false },
     -- Helpful for finding out what keys are mapped to interatively
     require('which-key-plugin'),
     -- Typescript LSP
@@ -200,8 +253,126 @@ require("lazy").setup({
     { 'hrsh7th/nvim-cmp' },
     {
       'mrcjkb/haskell-tools.nvim',
-      version = '^6', -- Recommended
+      version = '^7', -- Recommended
       lazy = false, -- This plugin is already lazy
+    },
+    {
+      "yetone/avante.nvim",
+      enabled = false,
+      -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+      -- ⚠️ must add this setting! ! !
+      build = vim.fn.has("win32") ~= 0
+          and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
+          or "make",
+      event = "VeryLazy",
+      version = false, -- Never set this value to "*"! Never!
+      ---@module 'avante'
+      ---@type avante.Config
+      opts = {
+        -- add any opts here
+        -- this file can contain specific instructions for your project
+        instructions_file = "avante.md",
+        -- for example
+        provider = "claude",
+        providers = {
+          claude = {
+            auth_type = "api",
+            endpoint = "https://api.anthropic.com",
+            model = "claude-sonnet-4-20250514",
+            timeout = 30000, -- Timeout in milliseconds
+              extra_request_body = {
+                temperature = 0.75,
+                max_tokens = 20480,
+              },
+          }
+        },
+        behaviour = {
+            auto_suggestions = false,
+            auto_set_highlight_group = true,
+            auto_set_keymaps = true,
+            auto_apply_diff_after_generation = false,
+            support_paste_from_clipboard = false,
+            minimize_diff = true, -- Whether to remove unchanged lines when applying a code block
+            enable_token_counting = true, -- Whether to enable token counting. Default to true.
+            auto_add_current_file = true, -- Whether to automatically add the current file when opening a new chat. Default to true.
+            auto_approve_tool_permissions = false, -- Default: auto-approve all tools (no prompts)
+            -- Examples:
+            -- auto_approve_tool_permissions = false,                -- Show permission prompts for all tools
+            -- auto_approve_tool_permissions = {"bash", "str_replace"}, -- Auto-approve specific tools only
+            ---@type "popup" | "inline_buttons"
+            confirmation_ui_style = "inline_buttons",
+            --- Whether to automatically open files and navigate to lines when ACP agent makes edits
+            ---@type boolean
+            acp_follow_agent_locations = true,
+          },
+          selection = {
+            enabled = true,
+            hint_display = "none",
+          },
+      },
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        "MunifTanjim/nui.nvim",
+        --- The below dependencies are optional,
+        "nvim-mini/mini.pick", -- for file_selector provider mini.pick
+        "nvim-telescope/telescope.nvim", -- for file_selector provider telescope
+        "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
+        "ibhagwan/fzf-lua", -- for file_selector provider fzf
+        "stevearc/dressing.nvim", -- for input provider dressing
+        "folke/snacks.nvim", -- for input provider snacks
+        "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+        "zbirenbaum/copilot.lua", -- for providers='copilot'
+        {
+          -- support for image pasting
+          "HakonHarnes/img-clip.nvim",
+          event = "VeryLazy",
+          opts = {
+            -- recommended settings
+            default = {
+              embed_image_as_base64 = false,
+              prompt_for_file_name = false,
+              drag_and_drop = {
+                insert_mode = true,
+              },
+              -- required for Windows users
+              use_absolute_path = true,
+            },
+          },
+        },
+        {
+          -- Make sure to set this up properly if you have lazy=true
+          'MeanderingProgrammer/render-markdown.nvim',
+          opts = {
+            file_types = { "markdown", "Avante" },
+          },
+          ft = { "markdown", "Avante" },
+        },
+      },
+    },
+    {
+      "coder/claudecode.nvim",
+      dependencies = { "folke/snacks.nvim" },
+      config = true,
+      lazy = false,
+      keys = {
+        { "<leader>a", nil, desc = "AI/Claude Code" },
+        { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
+        { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
+        { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
+        { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
+        -- { "<leader>am", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Claude model" },
+        { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
+        { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
+        {
+          "<leader>as",
+          "<cmd>ClaudeCodeTreeAdd<cr>",
+          desc = "Add file",
+          ft = { "NvimTree", "neo-tree", "oil", "minifiles", "netrw" },
+        },
+        -- Diff management
+        { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+        { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+      },
     }
 
 
@@ -211,6 +382,10 @@ require("lazy").setup({
   install = { colorscheme = { "habamax" } },
   -- automatically check for plugin updates
   checker = { enabled = false },
+  rocks = {
+    enabled = true,
+    hererocks = true, -- you should enable this to get hererocks support
+  }
 })
 
 ---------- Persistent undo ----------
@@ -221,7 +396,7 @@ end
 
 ---------- Enable line numbers for particular file types -------------
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "vim,idris2,python,javascript,lua,c,hott,nova,txt,agda,scala,cpp,h",
+  pattern = "vim,idris2,python,javascript,lua,c,hott,nova,txt,agda,scala,cpp,h,haskell",
   callback = function(_)
     vim.o.number = true
   end,
@@ -377,7 +552,33 @@ vim.cmd [[nnoremap <silent> <C-x>qb :b#<bar>bd#<CR>]]
 vim.cmd [[nnoremap <C-u> <C-^>]]
 
 ------------------ Window manipulation interface (custom plugin) -----------------
-vim.cmd [[execute("source " . g:main_config_file_dir . "/config/window_manip.vim")]]
+local win_manip = require("window-manip")
+win_manip.setup({})
+
+-- Start window manipulation session
+vim.keymap.set("n", "<C-w>w", function() win_manip.start("focus", false) end)
+
+-- Switching between windows (j=left, i=up, k=down, l=right)
+vim.keymap.set("n", "<C-w>i", function() vim.cmd.wincmd("k") end)
+vim.keymap.set("n", "<C-w>k", function() vim.cmd.wincmd("j") end)
+vim.keymap.set("n", "<C-w>j", function() vim.cmd.wincmd("h") end)
+vim.keymap.set("n", "<C-w>l", function() vim.cmd.wincmd("l") end)
+
+-- Switching between windows from terminal mode
+vim.keymap.set("t", "<C-w>i", function() vim.cmd.wincmd("k") end)
+vim.keymap.set("t", "<C-w>j", function() vim.cmd.wincmd("h") end)
+vim.keymap.set("t", "<C-w>k", function() vim.cmd.wincmd("j") end)
+vim.keymap.set("t", "<C-w>l", function() vim.cmd.wincmd("l") end)
+
+-- Push current window to screen edge
+vim.keymap.set("n", "<C-w>I", function() vim.cmd.wincmd("K") end)
+vim.keymap.set("n", "<C-w>K", function() vim.cmd.wincmd("J") end)
+vim.keymap.set("n", "<C-w>J", function() vim.cmd.wincmd("H") end)
+vim.keymap.set("n", "<C-w>L", function() vim.cmd.wincmd("L") end)
+vim.keymap.set("t", "<C-w>I", function() vim.cmd.wincmd("K") end)
+vim.keymap.set("t", "<C-w>K", function() vim.cmd.wincmd("J") end)
+vim.keymap.set("t", "<C-w>J", function() vim.cmd.wincmd("H") end)
+vim.keymap.set("t", "<C-w>L", function() vim.cmd.wincmd("L") end)
 
 -------------- Jumping inside buffer only (custom plugin) ----------------
 vim.cmd [[execute("source " . g:main_config_file_dir . "/config/jumping.vim")]]
@@ -413,10 +614,10 @@ require('lspconfig').yamlls.setup {}
 require('telescope-setup')
 
 -------------- Moving selection around (custom plugin) -------------
-vim.api.nvim_set_keymap('v', '<C-k>', ":lua require('move').moveSelectionDown()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap('v', '<C-i>', ":lua require('move').moveSelectionUp()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap('v', '<C-l>', ":lua require('move').moveSelectionRight()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap('v', '<C-j>', ":lua require('move').moveSelectionLeft()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<C-k>', ":lua require('block-move').moveSelectionDown()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<C-i>', ":lua require('block-move').moveSelectionUp()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<C-l>', ":lua require('block-move').moveSelectionRight()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<C-j>', ":lua require('block-move').moveSelectionLeft()<CR>", { noremap = true, silent = true })
 
 --------------- CmdBuf ---------------
 vim.cmd [[noremap q: <Cmd>lua require('cmdbuf').split_open(vim.o.cmdwinheight)<CR>]]
@@ -502,6 +703,8 @@ vim.api.nvim_set_keymap('n', '<LocalLeader>i', ':lua vim.lsp.buf.implementation(
   { noremap = true, silent = false })
 vim.api.nvim_set_keymap('n', '<LocalLeader>r', ':lua vim.lsp.buf.references()<CR>',
   { noremap = true, silent = false })
+vim.api.nvim_set_keymap('n', '<LocalLeader>w', ':lua vim.lsp.buf.rename()<CR>',
+  { noremap = true, silent = false })
 vim.api.nvim_set_keymap('n', ']d', ':lua vim.diagnostic.goto_next()<CR>',
   { noremap = true, silent = false })
 vim.api.nvim_set_keymap('n', '[d', ':lua vim.diagnostic.goto_prev()<CR>',
@@ -529,6 +732,9 @@ require('lspconfig').clangd.setup {}
 --------------- Rust --------------
 require('rust-setup')
 
+----------- Type Script -----------
+vim.lsp.enable('tsserver')
+
 --------------- JSON ----------------
 require('lspconfig').jsonls.setup {}
 
@@ -537,6 +743,9 @@ require('idris2-setup')
 
 ----------------- Nova ----------------
 require("nova-setup")
+
+----------------- Massimult ----------------
+require("massimult-setup")
 
 ----------------- Homotopy Objective Type Theory ----------------
 require("hott-setup")
@@ -555,3 +764,13 @@ require('haskell-tools-setup')
 
 ----------------- venn-setup ----------------
 require('venn-setup')
+
+------------------  MISC  ----------------------
+
+vim.api.nvim_create_user_command(
+  'Browse',
+  function (opts)
+    vim.fn.system { 'open', opts.fargs[1] }
+  end,
+  { nargs = 1 }
+)
