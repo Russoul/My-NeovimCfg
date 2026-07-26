@@ -65,10 +65,15 @@ lspconfig.nova_lsp.setup {
 
         local line = vim.api.nvim_buf_get_lines(bufnr, prev_line, prev_line + 1, false)[1]
         -- print("line", line, "column", prev_start)
-        if (vim.fn.strchars(line) >= prev_start) then
-          local byte_start = vim.str_byteindex(line, prev_start)
-          if prev_start + data[i + 2] >= 0 and prev_start + data[i + 2] <= vim.fn.strchars(line) then
-            local byte_end = vim.str_byteindex(line, prev_start + data[i + 2])
+        -- prev_start / data[i+2] are UTF-16 code-unit offsets (nova-lsp's
+        -- default), so bounds must be checked against the line's UTF-16
+        -- length, not its codepoint count (strchars) -- they diverge
+        -- whenever the line has a non-BMP character (e.g. 𝕌, 𝟘, 𝟙).
+        local _, utf16_len = vim.str_utfindex(line)
+        if (utf16_len >= prev_start) then
+          local byte_start = vim.str_byteindex(line, prev_start, true)
+          if prev_start + data[i + 2] >= 0 and prev_start + data[i + 2] <= utf16_len then
+            local byte_end = vim.str_byteindex(line, prev_start + data[i + 2], true)
 ---@diagnostic disable-next-line: param-type-mismatch
             vim.api.nvim_buf_add_highlight(bufnr, ns, 'NOVASemantic_' .. token_type, prev_line, byte_start, byte_end)
           else
